@@ -14,11 +14,15 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import HomeScreen from './screens/HomeScreen';
 import TripListScreen from './screens/TripListScreen'
 import SettingsScreen from './screens/SettingsScreen'
+import LoginScreen from './screens/Login'
+import CreateAccountScreen from './screens/CreateAccountScreen'
 
 // Screen Names
 const homeName = 'Home'
 const tripListName = 'Trip List'
 const settingsName = 'Settings'
+const loginName = 'Login'
+const createAccountName = 'Create'
 
 const Tab = createBottomTabNavigator();
 
@@ -26,7 +30,7 @@ export default function MainContainer(){
     return(
         <NavigationContainer>
             <Tab.Navigator
-            initialRouteName={homeName}
+            initialRouteName={loginName}
             screenOptions={({route}) => ({
                 tabBarActiveTintColor: '#F7D044', 
                 tabBarInactiveTintColor: '#F7D044', 
@@ -54,9 +58,12 @@ export default function MainContainer(){
 
             <Tab.Screen name={homeName} component={HomeScreen}/>
             <Tab.Screen name={tripListName} component={TripListScreen}/>
-            <Tab.Screen name={settingsName} component={SettingsScreen}/>
+            <Tab.Screen name={settingsName} component={SettingsScreen} />
+                <Tab.Screen name={loginName} component={LoginScreen} />
+                <Tab.Screen name={createAccountName} component={CreateAccountScreen} /> 
 
             </Tab.Navigator>
         </NavigationContainer>
     )
+    // From Zach - I Added a Tab for the Login Screen So I cant Test the Design of it without any issues going back and forth
 }

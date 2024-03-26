@@ -4,59 +4,59 @@
 import { StatusBar } from 'expo-status-bar';
 import {
     StyleSheet, Button, View, SafeAreaView,
-    Text, Alert, TextInput, TouchableOpacity, 
+    Text, Alert, TextInput, TouchableOpacity,
 } from 'react-native';
 import React, { useState } from 'react';
 
 
 
-const onPressLogin = () => {
-    console.log('Login Pressed')
+const onPressSignUp = () => {
+    console.log('Sign Up Pressed')
 };
 
-const onPressForgotPassword = () => {
-    console.log('ForgotPassword Pressed')
-    // Look Into Custom Dialogs with React Native, Alerts don't allow text input to be placed in them - Z
+const onPressSignIn = () => {
+    console.log('Already Has An Account Pressed')
+
 };
 
-const onPressCreateAccount = () => {
-    console.log('CreateAccount Pressed')
-    
-};
-
-export default function Login({ navigation }) {
+export default function CreateAccount({ navigation }) {
 
     const [state, setState] = useState({
         email: ' ',
         password: ' ',
+        name: ' ',
     })
-    return(
-    <View style={styles.container}>
-        <Text style={styles.title}>Log In</Text>
+    return (
+        <View style={styles.container}>
+            <Text style={styles.title}>Create Account</Text>
+            <View style={styles.inputView}>
+                <TextInput style={styles.inputText}
+                    placeholder="Name"
+                    placeholderTextColor="#f2d15f"
+                // onChangeText={text => setState({ name: text })}
+                />
+            </View>
             <View style={styles.inputView}>
                 <TextInput style={styles.inputText}
                     placeholder="Email"
                     placeholderTextColor="#f2d15f"
-                    // onChangeText={text => setState({ email: text })}
+                // onChangeText={text => setState({ email: text })}
                 />
             </View>
             <View style={styles.inputView}>
                 <TextInput style={styles.inputText}
                     placeholder="Password"
                     placeholderTextColor="#f2d15f"
-                    // onChangeText={text => setState({ password: text })}
+                // onChangeText={text => setState({ password: text })}
                 />
             </View>
-            <TouchableOpacity onPress={onPressLogin}>
-                <Text style={styles.loginText}>Login Now</Text>
+            <TouchableOpacity onPress={onPressSignUp}>
+                <Text style={styles.loginText}>Sign Up Now!</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={onPressForgotPassword}>
-                <Text style={styles.forgotAndSignUpText}>Forgot Password?</Text>
+            <TouchableOpacity onPress={onPressSignIn}>
+                <Text style={styles.forgotAndSignUpText}>Already have an Account? Click Here!</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={onPressCreateAccount}>
-                <Text style={styles.forgotAndSignUpText}>Create Account</Text>
-            </TouchableOpacity>
-  </View>
+        </View>
 
     );
 }
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     },
     inputText: {
         height: 50,
-        color:"white",
+        color: "white",
     },
     forgotAndSignUpText: {
         color: "white",
@@ -97,9 +97,9 @@ const styles = StyleSheet.create({
         color: "#f2d15f",
         borderRadius: 25,
         justifyContent: "center",
-        alignContent:"center",
+        alignContent: "center",
         padding: 20,
         marginTop: 40,
         marginBottom: 10,
     },
-  });
+});
