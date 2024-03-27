@@ -10,21 +10,24 @@ import React, { useState } from 'react';
 
 
 
-const onPressLogin = () => {
-    console.log('Login Pressed')
-};
 
-const onPressForgotPassword = () => {
-    console.log('ForgotPassword Pressed')
-    // Look Into Custom Dialogs with React Native, Alerts don't allow text input to be placed in them - Z
-};
-
-const onPressCreateAccount = () => {
-    console.log('CreateAccount Pressed')
-    
-};
 
 export default function Login({ navigation }) {
+
+    const onPressLogin = () => {
+        console.log('Login Pressed')
+        navigation.navigate("MainContainer")
+    };
+    
+    const onPressForgotPassword = () => {
+        console.log('ForgotPassword Pressed')
+        // Look Into Custom Dialogs with React Native, Alerts don't allow text input to be placed in them - Z
+    };
+    
+    const onPressCreateAccount = () => {
+        console.log('CreateAccount Pressed')
+        navigation.navigate("CreateAccount")
+    };
 
     const [state, setState] = useState({
         email: ' ',

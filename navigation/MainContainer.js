@@ -28,7 +28,6 @@ const Tab = createBottomTabNavigator();
 
 export default function MainContainer(){
     return(
-        <NavigationContainer>
             <Tab.Navigator
             initialRouteName={loginName}
             screenOptions={({route}) => ({
@@ -62,12 +61,9 @@ export default function MainContainer(){
             <Tab.Screen name={homeName} component={HomeScreen}/>
             <Tab.Screen name={tripListName} component={TripListScreen}/>
             <Tab.Screen name={settingsName} component={SettingsScreen} />
-                <Tab.Screen name={loginName} component={LoginScreen} />
-                <Tab.Screen name={createAccountName} component={CreateAccountScreen} /> 
-                <Tab.Screen name={pdfGenerator} component={PDFGenerator} /> 
+                
 
             </Tab.Navigator>
-        </NavigationContainer>
     )
     // From Zach - I Added a Tab for the Login Screen So I cant Test the Design of it without any issues going back and forth
 }

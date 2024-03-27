@@ -39,7 +39,7 @@ export default function CreateAccount({ navigation }) {
     
     const onPressSignIn = () => {
         console.log('Already Has An Account Pressed')
-    
+        navigation.navigate("Login")
     };
 
     return (

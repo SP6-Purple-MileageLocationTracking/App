@@ -11,20 +11,13 @@ export default function TripListScreen({navigation}) {
     return(
         <View style={styles.container}>
           
-        <Text style={{fontWeight: "bold"}}>TripScreen</Text>
-        <Text>Team SP6 - Purple: Mason Sherrill, Alex Nguyen, Brian Nghiem, Shaun Teague, Zachary Morning</Text>
-        <Text>Testing 1...2...3...</Text>
-        <Text style={{
-            fontWeight: "800"}}>Welp, It does seem to work...</Text>
+        
         <Button
 
             // Some properties given to Button 
-            title="Test Button"
-            onPress={() => Alert.alert(
-                'Thank you for Testing')}
+            title="Upload Button"
+            onPress={() => navigation.navigate("PDFGenerator")}
         /> 
-        <Text>This Code is in TypeScript</Text>
-        <Text style={{fontWeight: "bold", fontSize: 16}}>This is Shaun, hopefully this works</Text>
   </View>
     );
 }
