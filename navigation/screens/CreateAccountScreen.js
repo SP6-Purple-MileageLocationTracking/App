@@ -7,17 +7,12 @@ import {
     Text, Alert, TextInput, TouchableOpacity,
 } from 'react-native';
 import React, { useState } from 'react';
+import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 
 
-const onPressSignUp = () => {
-    console.log('Sign Up Pressed')
-};
 
-const onPressSignIn = () => {
-    console.log('Already Has An Account Pressed')
-
-};
 
 export default function CreateAccount({ navigation }) {
 
@@ -26,6 +21,27 @@ export default function CreateAccount({ navigation }) {
         password: ' ',
         name: ' ',
     })
+
+    const auth = FIREBASE_AUTH;
+
+    const onPressSignUp = async () => {
+        console.log('Sign Up Pressed')
+        setLoading(true);
+        try {
+            const response = await signInWithEmailAndPassword(auth,email,password)
+            console.log(response)
+        } catch(error) {
+            console.log(error)
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    const onPressSignIn = () => {
+        console.log('Already Has An Account Pressed')
+    
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Create Account</Text>
@@ -33,21 +49,22 @@ export default function CreateAccount({ navigation }) {
                 <TextInput style={styles.inputText}
                     placeholder="Name"
                     placeholderTextColor="#f2d15f"
-                // onChangeText={text => setState({ name: text })}
+                onChangeText={text => setState({ name: text })}
                 />
             </View>
             <View style={styles.inputView}>
                 <TextInput style={styles.inputText}
                     placeholder="Email"
                     placeholderTextColor="#f2d15f"
-                // onChangeText={text => setState({ email: text })}
+                onChangeText={text => setState({ email: text })}
                 />
             </View>
             <View style={styles.inputView}>
                 <TextInput style={styles.inputText}
+                    secureTextEntry={true}
                     placeholder="Password"
                     placeholderTextColor="#f2d15f"
-                // onChangeText={text => setState({ password: text })}
+                onChangeText={text => setState({ password: text })}
                 />
             </View>
             <TouchableOpacity onPress={onPressSignUp}>
