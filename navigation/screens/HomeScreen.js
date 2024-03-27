@@ -3,30 +3,28 @@
 import { StatusBar } from 'expo-status-bar';
 import {
     StyleSheet, Button, View, SafeAreaView,
-    Text, Alert
+    Text, Alert, TouchableOpacity,
 } from 'react-native';
 import React from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 
 export default function HomeScreen({navigation}) {
+
+    const onPressStart = () => {
+        console.log('Start Pressed')
+    };
+
+
     return(
         <View style={styles.container}>
-          
-        <Text style={{fontWeight: "bold"}}>Time-Mileage App</Text>
-        <Text>Team SP6 - Purple: Mason Sherrill, Alex Nguyen, Brian Nghiem, Shaun Teague, Zachary Morning</Text>
-        <Text>Testing 1...2...3...</Text>
-        <Text style={{
-            fontWeight: "800"}}>Welp, It does seem to work...</Text>
-        <Button
+            <View style={styles.currentTrip}></View>
+                <TouchableOpacity onPress={onPressStart} style={styles.startTrip}>
+                    <Ionicons name="add-outline" size={30} color="#f2d15f" />
+                    <Text style={styles.startText}>Start Trip</Text>
+                </TouchableOpacity>
 
-            // Some properties given to Button 
-            title="Test Button"
-            onPress={() => Alert.alert(
-                'Thank you for Testing')}
-        /> 
-        <Text>This Code is in TypeScript</Text>
-        <Text style={{fontWeight: "bold", fontSize: 16}}>This is Shaun, hopefully this works</Text>
-  </View>
+        </View>
     );
 }
 
@@ -36,6 +34,30 @@ const styles = StyleSheet.create({
       backgroundColor: '#3D3648',
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    currentTrip: {
+        width: '90%',
+        flexDirection: 'row',
+        height: 300,
+        backgroundColor: '#211D26',
+        borderRadius: 20,
+    },
+    startTrip: {
+        width: "50%",
+        backgroundColor: "#201d25",
+        color: "#f2d15f",
+        borderRadius: 25,
+        flexDirection: 'row',
+        justifyContent: "center",
+        alignContent:"center",
+        alignItems: 'center',
+        padding: 20,
+        marginTop: 20,
+        marginBottom: 10,
+    },
+    startText: {
+        color: "#f2d15f",
+        marginLeft: 5,
     },
   });
   
