@@ -4,34 +4,34 @@
 import { StatusBar } from 'expo-status-bar';
 import {
     StyleSheet, Button, View, SafeAreaView,
-    Text, Alert, TextInput, TouchableOpacity,
+    Text, Alert, TextInput, TouchableOpacity, Modal
 } from 'react-native';
 import React, { useState } from 'react';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
 
 
 
 
 export default function CreateAccount({ navigation }) {
-
-    const [state, setState] = useState({
-        email: ' ',
-        password: ' ',
-        name: ' ',
-    })
-
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [name,setName] = useState('');
+    const [email,setEmail] = useState('');
+    const [password,setPassword] = useState('')
+    const [loading,setLoading] = useState(false)
     const auth = FIREBASE_AUTH;
 
     const onPressSignUp = async () => {
         console.log('Sign Up Pressed')
         setLoading(true);
         try {
-            const response = await signInWithEmailAndPassword(auth,email,password)
+            const response = await createUserWithEmailAndPassword(auth,email,password)
+            navigation.navigate("MainContainer")
             console.log(response)
         } catch(error) {
             console.log(error)
+            setIsModalVisible(true)
         } finally {
             setLoading(false);
         }
@@ -49,14 +49,14 @@ export default function CreateAccount({ navigation }) {
                 <TextInput style={styles.inputText}
                     placeholder="Name"
                     placeholderTextColor="#f2d15f"
-                onChangeText={text => setState({ name: text })}
+                onChangeText={text => setName(text)}
                 />
             </View>
             <View style={styles.inputView}>
                 <TextInput style={styles.inputText}
                     placeholder="Email"
                     placeholderTextColor="#f2d15f"
-                onChangeText={text => setState({ email: text })}
+                onChangeText={text => setEmail(text)}
                 />
             </View>
             <View style={styles.inputView}>
@@ -64,7 +64,7 @@ export default function CreateAccount({ navigation }) {
                     secureTextEntry={true}
                     placeholder="Password"
                     placeholderTextColor="#f2d15f"
-                onChangeText={text => setState({ password: text })}
+                onChangeText={text => setPassword(text)}
                 />
             </View>
             <TouchableOpacity onPress={onPressSignUp}>
@@ -73,6 +73,16 @@ export default function CreateAccount({ navigation }) {
             <TouchableOpacity onPress={onPressSignIn}>
                 <Text style={styles.forgotAndSignUpText}>Already have an Account? Click Here!</Text>
             </TouchableOpacity>
+
+            <Modal visible={isModalVisible} onRequestClose={() => setIsModalVisible(false)} animationType="slide" transparent={true}>
+            <View style ={styles.bottomView}>
+                <Text style={styles.modalText}>Account Creation Failed</Text>
+                <TouchableOpacity onPress={()=>setIsModalVisible(false)}>
+                    <Text style={styles.modalButton}>Close</Text>
+                </TouchableOpacity>
+            </View>
+            </Modal>
+
         </View>
 
     );
@@ -119,4 +129,36 @@ const styles = StyleSheet.create({
         marginTop: 40,
         marginBottom: 10,
     },
+    modalView: {
+        flex: 1,
+        justifyContent: 'flex-end',
+
+    },
+    bottomView: {
+        width: "100%",
+        borderRadius: 20,
+        backgroundColor: "#201d25",
+        justifyContent: "center",
+        alignContent:"center",
+        paddingBottom: 20,
+        position: "absolute",
+        bottom: 0
+    },
+    modalText: {
+        fontSize: 20,
+        marginTop: 20,
+        marginBottom: 10,
+        color: "white",
+        textAlign: 'center'
+    },
+    modalButton: {
+        backgroundColor: "#201d25",
+        color: "#f2d15f",
+        justifyContent: "center",
+        alignContent:"center",
+        marginTop: 20,
+        marginBottom: 20,
+        alignSelf: 'center',
+    },
+
 });
