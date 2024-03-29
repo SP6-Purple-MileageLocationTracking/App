@@ -18,12 +18,13 @@ export default function HomeScreen({navigation}) {
 
     return(
         <View style={styles.container}>
-            <View style={styles.currentTrip}></View>
+            <View style={styles.currentTrip}>
+                <Ionicons name="car-outline" size={60} margin={20}  color="#f2d15f"></Ionicons>
+            </View>
                 <TouchableOpacity onPress={onPressStart} style={styles.startTrip}>
-                    <Ionicons name="add-outline" size={30} color="#f2d15f" />
+                    <Ionicons name="add-outline" size={40} color="#f2d15f" />
                     <Text style={styles.startText}>Start Trip</Text>
                 </TouchableOpacity>
-
         </View>
     );
 }
@@ -56,6 +57,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     startText: {
+        fontSize: 20,
         color: "#f2d15f",
         marginLeft: 5,
     },
