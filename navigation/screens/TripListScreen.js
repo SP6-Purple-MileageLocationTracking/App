@@ -7,105 +7,121 @@ import {
 } from 'react-native';
 import React from 'react';
 import { FlatList, GestureHandlerRootView } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import { Directions } from 'react-native-gesture-handler';
 
 export default function TripListScreen({navigation}) {
 
     const trips = [
         {
             id: 1,
-            start: 'Atlanta',
-            end: 'Tampa',
+            date: '3 / 6 / 24',
+            start: 'ATL',
+            end: 'TPA',
             mileage: 24.4,
             dist: 400,
         },
         {
             id: 2,
-            start: 'New York',
-            end: 'Los Angeles',
+            date: '3 / 6 / 24',
+            start: 'ALB',
+            end: 'LAX',
             mileage: 120,
             dist: 2800,
         },
         {
             id: 3,
-            start: 'Chicago',
-            end: 'Houston',
+            date: '3 / 6 / 24',
+            start: 'MDW',
+            end: 'HOU',
             mileage: 82.5,
             dist: 1000,
         },
         {
             id: 4,
-            start: 'Miami',
-            end: 'Seattle',
+            date: '3 / 6 / 24',
+            start: 'MIA',
+            end: 'SEA',
             mileage: 150.7,
             dist: 3000,
         },
         {
             id: 5,
-            start: 'Denver',
-            end: 'Phoenix',
+            date: '3 / 6 / 24',
+            start: 'Den',
+            end: 'PHX',
             mileage: 60.2,
             dist: 800,
         },
         {
             id: 6,
-            start: 'Boston',
-            end: 'San Francisco',
+            date: '3 / 6 / 24',
+            start: 'BOS',
+            end: 'SFO',
             mileage: 123.8,
             dist: 2900,
         },
         {
             id: 7,
-            start: 'Dallas',
-            end: 'Orlando',
+            date: '3 / 6 / 24',
+            start: 'DAL',
+            end: 'MCO',
             mileage: 93.6,
             dist: 1100,
         },
         {
             id: 8,
-            start: 'Washington D.C.',
-            end: 'Las Vegas',
+            date: '3 / 6 / 24',
+            start: 'DCA',
+            end: 'LAS',
             mileage: 140.5,
             dist: 2400,
         },
         {
             id: 9,
-            start: 'Philadelphia',
-            end: 'San Diego',
+            date: '3 / 6 / 24',
+            start: 'PHL',
+            end: 'SAN',
             mileage: 127.2,
             dist: 2700,
         },
         {
             id: 10,
-            start: 'Houston',
-            end: 'Portland',
+            date: '3 / 6 / 24',
+            start: 'HOU',
+            end: 'PWM',
             mileage: 185.3,
             dist: 3200,
         },
         {
             id: 11,
-            start: 'Seattle',
-            end: 'Miami',
+            date: '3 / 6 / 24',
+            start: 'SEA',
+            end: 'MIA',
             mileage: 150.7,
             dist: 3000,
         },
         {
             id: 12,
-            start: 'Los Angeles',
-            end: 'New York',
+            date: '3 / 6 / 24',
+            start: 'LAX',
+            end: 'ALB',
             mileage: 120,
             dist: 2800,
         },
         {
             id: 13,
-            start: 'San Francisco',
-            end: 'Boston',
+            date: '3 / 6 / 24',
+            start: 'SFO',
+            end: 'BOS',
             mileage: 123.8,
             dist: 2900,
         },
         {
             id: 14,
-            start: 'Orlando',
-            end: 'Dallas',
+            date: '3 / 6 / 24',
+            start: 'MCO',
+            end: 'DAL',
             mileage: 93.6,
             dist: 1100,
         },
@@ -114,12 +130,24 @@ export default function TripListScreen({navigation}) {
     const oneTrip = ( {item} ) => {
         console.log("Rendering Trip:", item);
             return(
-            <View style={styles.tripContainer} key={item.id}>
-                <Text style={styles.tripText}>Start: {item.start}</Text>
-                <Text style={styles.tripText}>End: {item.end}</Text>
-                <Text style={styles.tripText}>Mileage: {item.mileage}</Text>
-                <Text style={styles.tripText}>Distance: {item.dist}</Text>
-            </View>
+                <View style={styles.tripContainer} key={item.id}>
+                    <Ionicons name="location-sharp" size={50} color="#f2d15f" />
+                    <View style={styles.tripDataContainer}>
+                        <View style={styles.tripDataContainerRow}>
+                            <Text style={styles.tripText}>{item.date}   </Text>
+                            <View style={styles.divider}></View>
+                            <Text style={styles.tripText}>   {item.start}</Text>
+                            <Ionicons name="chevron-forward" size={30} color="#f2d15f"/>
+                            <Text style={styles.tripText}>{item.end} </Text>
+                        </View>
+                        <View style={styles.tripDataContainerRow}>
+                            <Ionicons name="car-sharp" size={30} color="#f2d15f"/>
+                            <Text style={styles.tripNums}> {item.mileage}mi/gal </Text>
+                            <Ionicons name="car-sharp" size={30} color="#f2d15f"/>
+                            <Text style={styles.tripNums}> {item.dist}mi</Text>
+                        </View>
+                    </View>
+                </View>
             );
     };
 
@@ -127,38 +155,71 @@ export default function TripListScreen({navigation}) {
 
     return(
         <View style={styles.container}>
-            <FlatList
-                style={styles.listContainer}
-                data = {trips}
-                renderItem = {oneTrip}
-                keyExtractor={(item) => item.id.toString()}
-            />
+            <View style={styles.headerContainer}>
+                <Text style={styles.tripText}></Text>
+            </View>
+            <View style={styles.listSection}>
+                <FlatList
+                    style={styles.listContainer}
+                    data = {trips}
+                    renderItem = {oneTrip}
+                    keyExtractor={(item) => item.id.toString()}
+                />
+            </View>
+            
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
+      flexDirection: 'column',
       backgroundColor: '#3D3648',
       alignItems: 'center',
       justifyContent: 'center',
     },
     tripContainer: {
-        backgroundColor: '#555',
-        padding: 10,
+        flexDirection: 'row',
+        backgroundColor: '#201d25',
+        padding: 5,
         marginBottom: 10,
-        borderRadius: 5,
+        borderRadius: 20,
+        alignItems: 'center',
     },
-    tripText:{
-        color: '#FFF',
-        fontSize: 18, 
+    tripDataContainer: {
+        flexDirection: 'column',
+    },
+    tripDataContainerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 20,
+    },
+    tripText: {
+        color: '#f2d15f',
+        fontSize: 24, 
         marginVertical: 10, 
     },
+    tripNums: {
+        color: '#FFFFFF',
+        fontSize: 20, 
+        marginVertical: 10, 
+    },
+    divider: {
+        backgroundColor: '#f2d15f',
+        height: '60%',
+        width: '2%',
+        borderRadius: 20,
+    },
     listContainer:{
-        flex: 1,
-        color: '#FFFFF',
-        width: '100%',
+        
+    },
+    headerContainer:{
+        position: 'relative',
+        backgroundColor: '#FF0000',
+    },
+    listSection: {
+        position: 'relative',
+        top: '30%',
     }
   });
   
