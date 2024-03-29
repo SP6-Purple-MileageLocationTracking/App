@@ -59,8 +59,8 @@ export default function MainContainer(){
             <Tab.Screen name={homeName} component={HomeScreen}/>
             <Tab.Screen name={tripListName} component={TripListScreen}/>
             <Tab.Screen name={settingsName} component={SettingsScreen} />
-                <Tab.Screen name={loginName} component={LoginScreen} />
-                <Tab.Screen name={createAccountName} component={CreateAccountScreen} /> 
+            <Tab.Screen name={loginName} component={LoginScreen} />
+           <Tab.Screen name={createAccountName} component={CreateAccountScreen} /> 
 
             </Tab.Navigator>
         </NavigationContainer>

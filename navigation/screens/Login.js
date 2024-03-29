@@ -12,6 +12,7 @@ import React, { useState } from 'react';
 
 const onPressLogin = () => {
     console.log('Login Pressed')
+
 };
 
 const onPressForgotPassword = () => {
@@ -36,14 +37,14 @@ export default function Login({ navigation }) {
             <View style={styles.inputView}>
                 <TextInput style={styles.inputText}
                     placeholder="Email"
-                    placeholderTextColor="#f2d15f"
+                    placeholderTextColor="#F7D044"
                     // onChangeText={text => setState({ email: text })}
                 />
             </View>
             <View style={styles.inputView}>
                 <TextInput style={styles.inputText}
                     placeholder="Password"
-                    placeholderTextColor="#f2d15f"
+                    placeholderTextColor="#F7D044"
                     // onChangeText={text => setState({ password: text })}
                 />
             </View>
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 50,
         marginBottom: 40,
-        color: "#f2d15f",
+        color: "#F7D044",
     },
     inputView: {
         width: "80%",
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
     loginText: {
         width: "80%",
         backgroundColor: "#201d25",
-        color: "#f2d15f",
+        color: "#F7D044",
         borderRadius: 25,
         justifyContent: "center",
         alignContent:"center",
