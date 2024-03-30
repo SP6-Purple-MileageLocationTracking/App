@@ -3,12 +3,14 @@
 import { StatusBar } from 'expo-status-bar';
 import {
     StyleSheet, Button, View, SafeAreaView,
-    Text, Alert
+    Text, Alert, TextInput, ActivityIndicator, Image
 } from 'react-native';
 import React from 'react';
 import { FlatList, GestureHandlerRootView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { Directions } from 'react-native-gesture-handler';
+
+const API_ENDPOINT = `https://randomuser.me/api/?results=30`;
 
 export default function TripListScreen({navigation}) {
 
@@ -153,11 +155,99 @@ export default function TripListScreen({navigation}) {
 
     console.log("Trips:", trips); // Log the entire trips array
 
+    /*for the search bar -Alex*/
+
+    /*
+    const [isLoading, setIsLoading] = useState(false);
+    const [data, setData] = useState([]);
+    const [error, setError] = useState(null);
+    const [fullData, setFullData] = useState([]);
+     const [searchQuery, setSearchQuery] = useState("");
+    */
+     
+     /*
+     useEffect(() => {
+        setIsLoading(true);
+        fetchData(API_ENDPOINT);
+     }, []);
+    */
+
+     /*This will fetch  */
+     /*
+     const fetchData = async(url) => {
+        try {
+            const response = await fetch(url);
+            const json = await respond.json();
+            setData(json.results);
+
+            console.log(json.results);
+            setIsLoading(false);
+
+        }catch(error)
+        {
+            setError(error);
+            console.log(error)
+            setIsLoading(false);
+        }
+     }
+    const handleSearch = (query) =>{
+        setSearchQuery(query);
+    }
+
+    if ( isLoading )
+    {
+        return (
+            <View style = {{flex:1, justifyContent: 'center', alignItems: 'center'}}>
+            <ActivityIndicator size={'large'} color ="#5500dc" />
+            </View>
+        );
+    }
+
+    if( error ) {
+        return (
+            <View style = {{flex:1, justifyContent:'center', alignItems:'center'}}>
+                <Text> Error in fetching data ...</Text>
+            </View>
+        )
+    }
+    */
     return(
         <View style={styles.container}>
+            
+            <SafeAreaView style={styles.searchBox}>
+                <TextInput 
+                placeholder="Search"
+                clearButtonMode ="always"
+                autoCapitalize = "none"
+                autoCorrect={false}
+                //value = {searchQuery}
+                //onChangeText = {(query) => handleSearch(query)}
+                />
+
+                
+                
+                <FlatList
+                /* This isn't finished but this is supposed to go to the API to decide which trip to get -Alex
+
+                data = {data}
+                keyExtractor = {(item) => item.login.userName}
+                renderItem = {({item}) => (
+                    <View style={styles.listContainer}>
+                        <Image source ={{uri: item.picture.thumbnail}} />
+                        <View>
+                            <Text>{item.name.first} {item.name.last}</Text>
+                            <Text>{item.email}</Text>
+                        </View>
+                    </View>
+                )}
+                */
+            />
+            </SafeAreaView>
+
             <View style={styles.headerContainer}>
                 <Text style={styles.tripText}></Text>
             </View>
+
             <View style={styles.listSection}>
                 <FlatList
                     style={styles.listContainer}
@@ -220,6 +310,15 @@ const styles = StyleSheet.create({
     listSection: {
         position: 'relative',
         top: '30%',
+    },
+    searchBox: {
+        flexDirection: 'row',
+        paddingHorizontal: 120,
+        paddingVertical: 10,
+        borderColor:"#ccc",
+        borderWidth: 1,
+        borderRadius: 8,
+        top: '30%'
     }
   });
   
