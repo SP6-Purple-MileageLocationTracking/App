@@ -33,7 +33,7 @@ export default function MainContainer(){
             screenOptions={({route}) => ({
                 tabBarActiveTintColor: '#F7D044', 
                 tabBarInactiveTintColor: '#F7D044', 
-                tabBarStyle: { backgroundColor: '#211D26',height: 60},
+                tabBarStyle: { backgroundColor: '#211D26',height: '8%'},
                 headerShown: false,
                 tabBarIcon: ({focused, color, size}) => {
                     let iconName;

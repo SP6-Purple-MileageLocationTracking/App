@@ -3,7 +3,7 @@
 import { StatusBar } from 'expo-status-bar';
 import {
     StyleSheet, Button, View, SafeAreaView,
-    Text, Alert, TextInput, ActivityIndicator, Image
+    Text, Alert, TextInput, ActivityIndicator, Image, TouchableOpacity
 } from 'react-native';
 import React from 'react';
 import { FlatList, GestureHandlerRootView } from 'react-native';
@@ -153,6 +153,11 @@ export default function TripListScreen({navigation}) {
             );
     };
 
+    const onPressUpload = () => {
+        console.log('upload Pressed')
+        navigation.navigate("PDFGenerator")
+    };
+
     console.log("Trips:", trips); // Log the entire trips array
 
     /*for the search bar -Alex*/
@@ -212,19 +217,24 @@ export default function TripListScreen({navigation}) {
     }
     */
     return(
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             
-            <SafeAreaView style={styles.searchBox}>
+            <SafeAreaView style={styles.top}>
                 <TextInput 
+                style={styles.searchBox}
                 placeholder="Search"
                 clearButtonMode ="always"
                 autoCapitalize = "none"
                 autoCorrect={false}
+                placeholderTextColor={"#f2d15f"}
                 //value = {searchQuery}
                 //onChangeText = {(query) => handleSearch(query)}
                 />
 
-                
+                <TouchableOpacity onPress={onPressUpload} style={styles.upload}>
+                    <Ionicons name="share-outline" size={35} color="#f2d15f" />
+                </TouchableOpacity>
+            </SafeAreaView>        
                 
                 <FlatList
                 /* This isn't finished but this is supposed to go to the API to decide which trip to get -Alex
@@ -242,22 +252,23 @@ export default function TripListScreen({navigation}) {
                 )}
                 */
             />
-            </SafeAreaView>
+            
 
             <View style={styles.headerContainer}>
                 <Text style={styles.tripText}></Text>
             </View>
 
-            <View style={styles.listSection}>
+            <SafeAreaView style={styles.listSection}>
                 <FlatList
                     style={styles.listContainer}
                     data = {trips}
                     renderItem = {oneTrip}
                     keyExtractor={(item) => item.id.toString()}
                 />
-            </View>
+            </SafeAreaView>
+        
             
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -267,6 +278,7 @@ const styles = StyleSheet.create({
       backgroundColor: '#3D3648',
       alignItems: 'center',
       justifyContent: 'center',
+      height: '100%'
     },
     tripContainer: {
         flexDirection: 'row',
@@ -301,7 +313,8 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     listContainer:{
-        
+        maxHeight:'83%',
+        bottom: '20%',
     },
     headerContainer:{
         position: 'relative',
@@ -312,13 +325,35 @@ const styles = StyleSheet.create({
         top: '30%',
     },
     searchBox: {
+        backgroundColor: '#211D26',
         flexDirection: 'row',
-        paddingHorizontal: 120,
+        paddingHorizontal: 20,
         paddingVertical: 10,
-        borderColor:"#ccc",
+        borderColor:"#211D26",
         borderWidth: 1,
-        borderRadius: 8,
-        top: '30%'
-    }
+        borderRadius: 20,
+        width:'75%',
+    },
+    upload: {
+        backgroundColor: '#211D26',
+        flexDirection: 'row',
+        marginLeft: 15,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '20%',
+        padding: 10,
+    },
+    top: {
+        backgroundColor: '#3D3648',
+        flexDirection: 'row',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderColor:"#211D26",
+        borderRadius: 20,
+        top: '30%',
+    },
+
+
   });
   

@@ -9,6 +9,7 @@ import {
 import React, { useState } from 'react';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 
 
@@ -18,8 +19,9 @@ export default function CreateAccount({ navigation }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [name,setName] = useState('');
     const [email,setEmail] = useState('');
-    const [password,setPassword] = useState('')
-    const [loading,setLoading] = useState(false)
+    const [password,setPassword] = useState('');
+    const [passwordVisible, setPasswordVisible] = useState(true);
+    const [loading,setLoading] = useState(false);
     const auth = FIREBASE_AUTH;
 
     const onPressSignUp = async () => {
@@ -56,6 +58,7 @@ export default function CreateAccount({ navigation }) {
                 <TextInput style={styles.inputText}
                     placeholder="Email"
                     placeholderTextColor="#f2d15f"
+                    autoCapitalize='none'
                 onChangeText={text => setEmail(text)}
                 />
             </View>
@@ -64,6 +67,7 @@ export default function CreateAccount({ navigation }) {
                     secureTextEntry={true}
                     placeholder="Password"
                     placeholderTextColor="#f2d15f"
+                    autoCapitalize='none'
                 onChangeText={text => setPassword(text)}
                 />
             </View>

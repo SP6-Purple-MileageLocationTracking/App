@@ -56,13 +56,16 @@ export default function Login({ navigation }) {
                 <TextInput style={styles.inputText}
                     placeholder="Email"
                     placeholderTextColor="#f2d15f"
+                    autoCapitalize='none'
                     onChangeText={text => setEmail(text)}
                 />
             </View>
             <View style={styles.inputView}>
                 <TextInput style={styles.inputText}
+                    secureTextEntry={true}
                     placeholder="Password"
                     placeholderTextColor="#f2d15f"
+                    autoCapitalize='none'
                     onChangeText={text => setPassword(text)}
                 />
             </View>
