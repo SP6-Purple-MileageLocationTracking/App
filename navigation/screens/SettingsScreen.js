@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/react-in-jsx-scope */
 import { StatusBar } from 'expo-status-bar';
+
 import {
     StyleSheet, Button, View, SafeAreaView,
-    Text, Alert
+    Text, Alert, PermissionsAndroid
 } from 'react-native';
-import React from 'react';
+import React from 'react'
+
+
 
 export default function SettingsScreen({navigation}) {
     return(
@@ -28,6 +31,9 @@ export default function SettingsScreen({navigation}) {
   </View>
     );
 }
+
+
+
 
 const styles = StyleSheet.create({
     container: {
