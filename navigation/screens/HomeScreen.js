@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/react-in-jsx-scope */
 import { StatusBar } from 'expo-status-bar';
+import * as Location from 'expo-location';
 import {
     StyleSheet, Button, View, SafeAreaView,
     Text, Alert, TouchableOpacity, 
@@ -14,7 +15,8 @@ export default function HomeScreen({navigation}) {
 
     const [tripStarted, setTripStarted] = useState(false)
     const [tripPlay, setTripPlay] = useState(false)
-
+    const [location, setLocation] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
     const [date, setDate] = useState('')
     const [startLoc, setStartLoc] = useState('')
     const [time, setTime] = useState(0)
@@ -22,11 +24,10 @@ export default function HomeScreen({navigation}) {
     const countRef = useRef(null);
     const [dis, setDis] = useState(0)
 
-    const onPressStart = () => {
+    function StartTrip() {
         //put start location code here -S
         setDate('3/6/24');
         setStartLoc('Tampa, FL')
-
         countRef.current = setInterval(() => {
             setTime((time) => time + 1);
         }, 1000);
@@ -36,6 +37,18 @@ export default function HomeScreen({navigation}) {
         console.log('Start Pressed')
         setTripPlay(true);
         setTripStarted(true);
+
+
+        if (Location.isBackgroundLocationAvailableAsync) {
+            console.log("Location is Enabled");
+        } else if (!Location.isBackgroundLocationAvailableAsync) {
+            console.log("Location is not Enabled");
+        }
+
+    }
+    const onPressStart = () => {
+
+        StartTrip()
     };
 
     const onPressPause = () => {
