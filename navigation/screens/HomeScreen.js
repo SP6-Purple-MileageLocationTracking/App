@@ -5,7 +5,7 @@ import {
     StyleSheet, Button, View, SafeAreaView,
     Text, Alert, TouchableOpacity, 
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 
@@ -17,15 +17,21 @@ export default function HomeScreen({navigation}) {
 
     const [date, setDate] = useState('')
     const [startLoc, setStartLoc] = useState('')
-    const [time, setTime] = useState('')
+    const [time, setTime] = useState(0)
+    const [displayTime, setDisplayTime] = useState('')
+    const countRef = useRef(null);
     const [dis, setDis] = useState(0)
 
     const onPressStart = () => {
         //put start location code here -S
         setDate('3/6/24');
         setStartLoc('Tampa, FL')
-        setTime('6:23')
-        setDis(472)
+
+        countRef.current = setInterval(() => {
+            setTime((time) => time + 1);
+        }, 1000);
+
+        setDis(472.2)
         //
         console.log('Start Pressed')
         setTripPlay(true);
@@ -34,23 +40,41 @@ export default function HomeScreen({navigation}) {
 
     const onPressPause = () => {
         //Stop keeping track of time/location when this button is pressed -S
+        clearInterval(countRef.current);
         setTripPlay(false);
         console.log('Pause Pressed')
     };
 
     const onPressPlay = () => {
         //Resume keeping track of time/location when this button is pressed -S
+        countRef.current = setInterval(() => {
+            setTime((time) => time + 1);
+        }, 1000);
         setTripPlay(true);
         console.log('Play Pressed')
     };
 
     const onPressEnd = () => {
         //the end button will send trip data to the database
-        //put that code here -S
+        //put that code here (return displayTime to database not Time, 
+        //time stores raw seconds while displayTime is formated) -S
+        setDisplayTime(timer(time))
+        clearInterval(countRef.current);
+        setTime(0);
         console.log('End Pressed')
         setTripPlay(false);
         setTripStarted(false);
     };
+    const timer = (t) => {
+        const hours = Math.floor(t / 3600);
+        const minutes = Math.floor((t%3600) / 60);
+        const seconds = time % 60;
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    useEffect(() => {
+        console.log('Saved Time: ', displayTime);
+    }, [displayTime]);
 
 
     return(
@@ -65,7 +89,7 @@ export default function HomeScreen({navigation}) {
                             <SafeAreaView style={{flexDirection:'row'}}>
                                 <Ionicons name="time-outline" size={30} color="#f2d15f" />
                                 <Text style={styles.infoText}>Time:</Text>
-                                <Text style={styles.numText}>{time}</Text>
+                                <Text style={styles.numText}>{timer(time)}</Text>
                             </SafeAreaView>
 
                             <SafeAreaView style={{flexDirection:'row',marginTop:15,}}>
