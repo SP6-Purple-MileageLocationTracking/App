@@ -47,7 +47,6 @@ export default function HomeScreen({navigation}) {
 
     }
     const onPressStart = () => {
-
         StartTrip()
     };
 

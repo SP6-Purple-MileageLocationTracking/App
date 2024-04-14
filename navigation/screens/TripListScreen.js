@@ -3,16 +3,22 @@
 import { StatusBar } from 'expo-status-bar';
 import {
     StyleSheet, Button, View, SafeAreaView,
-    Text, Alert, TextInput, ActivityIndicator, Image, TouchableOpacity
+    Text, Alert, TextInput, ActivityIndicator, 
+    Image, TouchableOpacity
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import { FlatList, GestureHandlerRootView } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Directions } from 'react-native-gesture-handler';
+//import CheckBox from 'react-native-checkbox-component';
+import { CheckBox } from 'react-native-elements';
 
 const API_ENDPOINT = `https://randomuser.me/api/?results=30`;
 
 export default function TripListScreen({navigation}) {
+
+    const [selectionMode, setSelectionMode] = useState(false);
+    const [selectedItems, setSelectedItems] = useState([]);
 
     const trips = [
         {
@@ -129,11 +135,33 @@ export default function TripListScreen({navigation}) {
         },
     ];
 
-    const oneTrip = ( {item} ) => {
+    const toggleSelection = (id) => {
+        if (selectedItems.includes(id)) {
+            setSelectedItems(selectedItems.filter(itemId => itemId !== id));
+        } else {
+            setSelectedItems([...selectedItems, id]);
+        }
+    };
+
+    const OneTrip = React.memo(( {item} ) => {
         console.log("Rendering Trip:", item);
             return(
                 <View style={styles.tripContainer} key={item.id}>
-                    <Ionicons name="location-sharp" size={50} color="#f2d15f" />
+                    {!selectionMode && (
+                        <Ionicons name="location-sharp" size={50} color="#f2d15f" />
+                    )}
+                    {selectionMode && (
+                        <CheckBox
+                            onPress={() => toggleSelection(item.id)}
+                            size={30}
+                            checkedIcon='check-square'
+                            uncheckedIcon='square-o'
+                            checkedColor='#f2d15f'
+                            uncheckedColor='#3D3648'
+                            checked={selectedItems.includes(item.id)}
+                            containerStyle={styles.checkBox}
+                        />
+                    )}
                     <View style={styles.tripDataContainer}>
                         <View style={styles.tripDataContainerRow}>
                             <Text style={styles.tripText}>{item.date}   </Text>
@@ -151,11 +179,16 @@ export default function TripListScreen({navigation}) {
                     </View>
                 </View>
             );
-    };
+    });
 
     const onPressUpload = () => {
         console.log('upload Pressed')
-        navigation.navigate("PDFGenerator")
+        //navigation.navigate("PDFGenerator")
+        setSelectionMode(selectMode => !selectMode);
+    };
+
+    const checked = () => {
+
     };
 
     console.log("Trips:", trips); // Log the entire trips array
@@ -231,9 +264,16 @@ export default function TripListScreen({navigation}) {
                 //onChangeText = {(query) => handleSearch(query)}
                 />
 
+                {!selectionMode && (
                 <TouchableOpacity onPress={onPressUpload} style={styles.upload}>
                     <Ionicons name="share-outline" size={35} color="#f2d15f" />
                 </TouchableOpacity>
+                )}
+                {selectionMode && (
+                <TouchableOpacity onPress={onPressUpload} style={styles.uploadAlt}>
+                    <Ionicons name="share-outline" size={35} color="#211D26" />
+                </TouchableOpacity>
+                )}
             </SafeAreaView>        
                 
                 <FlatList
@@ -262,7 +302,7 @@ export default function TripListScreen({navigation}) {
                 <FlatList
                     style={styles.listContainer}
                     data = {trips}
-                    renderItem = {oneTrip}
+                    renderItem={({ item }) => <OneTrip item={item} />}
                     keyExtractor={(item) => item.id.toString()}
                 />
             </SafeAreaView>
@@ -344,6 +384,16 @@ const styles = StyleSheet.create({
         width: '20%',
         padding: 10,
     },
+    uploadAlt: {
+        backgroundColor: '#f2d15f',
+        flexDirection: 'row',
+        marginLeft: 15,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '20%',
+        padding: 10,
+    },
     top: {
         backgroundColor: '#3D3648',
         flexDirection: 'row',
@@ -352,6 +402,9 @@ const styles = StyleSheet.create({
         borderColor:"#211D26",
         borderRadius: 20,
         top: '30%',
+    },
+    checkBox: {
+        padding: 0
     },
 
 
