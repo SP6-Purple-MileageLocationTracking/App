@@ -9,6 +9,8 @@ import {
 import React, { useState } from 'react';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { FIRESTORE_DB } from '../../FirebaseConfig';
+import { collection, getDocs, addDoc } from 'firebase/firestore'; 
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 
@@ -29,6 +31,7 @@ export default function CreateAccount({ navigation }) {
         setLoading(true);
         try {
             const response = await createUserWithEmailAndPassword(auth,email,password)
+            await createUserCollection(response.user.uid, name, email);
             navigation.navigate("MainContainer")
             console.log(response)
         } catch(error) {
@@ -36,6 +39,20 @@ export default function CreateAccount({ navigation }) {
             setIsModalVisible(true)
         } finally {
             setLoading(false);
+        }
+    };
+
+    const createUserCollection = async (userId, name, email) => {
+        try {
+            const userRef = collection(FIRESTORE_DB, 'users');
+            const userDocRef = await addDoc(userRef, {
+                userId: userId,
+                name: name,
+                email: email
+            });
+            console.log('User collection created successfully');
+        } catch (error) {
+            console.error('Error creating user collection: ', error);
         }
     };
     

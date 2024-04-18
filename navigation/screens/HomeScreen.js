@@ -7,7 +7,10 @@ import {
     Text, Alert, TouchableOpacity, 
 } from 'react-native';
 import React, {useState, useRef, useEffect} from 'react';
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../FirebaseConfig';
+import { userId } from '../../FirebaseConfig';
 
 
 
@@ -19,6 +22,7 @@ export default function HomeScreen({navigation}) {
     const [errorMsg, setErrorMsg] = useState(null);
     const [date, setDate] = useState('')
     const [startLoc, setStartLoc] = useState('')
+    const [endLoc, setEndLoc] = useState('')
     const [time, setTime] = useState(0)
     const [displayTime, setDisplayTime] = useState('')
     const countRef = useRef(null);
@@ -70,6 +74,8 @@ export default function HomeScreen({navigation}) {
         //the end button will send trip data to the database
         //put that code here (return displayTime to database not Time, 
         //time stores raw seconds while displayTime is formated) -S
+        saveTripData();
+
         setDisplayTime(timer(time))
         clearInterval(countRef.current);
         setTime(0);
@@ -77,6 +83,30 @@ export default function HomeScreen({navigation}) {
         setTripPlay(false);
         setTripStarted(false);
     };
+
+    const saveTripData =  async () => {
+        try {
+            const userRef = collection(FIRESTORE_DB, 'users');
+            console.log("user again",userId)
+            const id = query(userRef, where('userId', '==', userId));
+            const idSnapshot = await getDocs(id)
+            if(!idSnapshot.empty) {
+                const userDoc = idSnapshot.docs[0]
+                const tripDataRef = collection(userDoc.ref, "trips")
+                const tripDocRef = await addDoc(tripDataRef, {
+                    date: date,
+                    startLoc: startLoc,
+                    endLoc: endLoc,
+                    time: displayTime, 
+                    distance: dis
+                });
+            }
+            console.log('Trip data added successfully');
+        } catch (error) {
+            console.error('Error adding trip data:', error);
+        }
+    };
+
     const timer = (t) => {
         const hours = Math.floor(t / 3600);
         const minutes = Math.floor((t%3600) / 60);

@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged} from "firebase/auth";
 import { getFirestore} from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -19,3 +19,13 @@ const firebaseConfig = {
 export const FIREBASE_APP = initializeApp(firebaseConfig);
 export const FIREBASE_AUTH = getAuth(FIREBASE_APP);
 export const FIRESTORE_DB = getFirestore(FIREBASE_APP);
+
+let userId = null;
+onAuthStateChanged(FIREBASE_AUTH, (user) => {
+  if (user) {
+    userId = user.uid;
+    console.log("userId set",userId)
+  } 
+});
+
+export {userId};
