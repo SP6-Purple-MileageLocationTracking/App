@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/react-in-jsx-scope */
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
@@ -42,6 +42,8 @@ export default function App() {
   }
 
   return (
+    <>
+        <StatusBar backgroundColor="#211D26" barStyle="light-content" />
         <NavigationContainer>
             <Stack.Navigator initialRouteName='Login'>
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
@@ -50,5 +52,6 @@ export default function App() {
                 <Stack.Screen name="PDFGenerator" component={PDFGenerator} options={{ headerShown: false }} />
             </Stack.Navigator>
         </NavigationContainer>
+      </>
     );
 }

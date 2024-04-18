@@ -6,16 +6,30 @@ import {
     Text, Alert, TextInput, ActivityIndicator, 
     Image, TouchableOpacity
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { FlatList, GestureHandlerRootView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Directions } from 'react-native-gesture-handler';
-//import CheckBox from 'react-native-checkbox-component';
 import { CheckBox } from 'react-native-elements';
+import { FIRESTORE_DB } from '../../FirebaseConfig';
+import { collection, getDocs } from 'firebase/firestore'; 
 
 const API_ENDPOINT = `https://randomuser.me/api/?results=30`;
 
 export default function TripListScreen({navigation}) {
+    useEffect(() => {
+        getTrips();
+    }, []);
+    const getTrips = async () =>{
+        try {
+            const tripsSnapshot = await getDocs(collection(FIRESTORE_DB, 'Trips'));
+            tripsSnapshot.forEach(doc => {
+                console.log(doc.id, '=>', doc.data());
+            });
+        } catch (error) {
+            console.error('Error getting trips:', error);
+        }
+    }
 
     const [selectionMode, setSelectionMode] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
