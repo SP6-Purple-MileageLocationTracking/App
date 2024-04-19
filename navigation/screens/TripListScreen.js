@@ -7,25 +7,45 @@ import {
     Image, TouchableOpacity
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { FlatList, GestureHandlerRootView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Directions } from 'react-native-gesture-handler';
 import { CheckBox } from 'react-native-elements';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
-import { collection, getDocs } from 'firebase/firestore'; 
+import { collection, getDocs, query, where, orderBy} from 'firebase/firestore'; 
+import { userId } from '../../FirebaseConfig';
 
 const API_ENDPOINT = `https://randomuser.me/api/?results=30`;
 
 export default function TripListScreen({navigation}) {
-    useEffect(() => {
-        getTrips();
-    }, []);
+
+    const [trips, setTrips] = useState([]);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            getTrips();
+        }, [])
+    );
+
     const getTrips = async () =>{
         try {
-            const tripsSnapshot = await getDocs(collection(FIRESTORE_DB, 'Trips'));
-            tripsSnapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-            });
+            const userRef = collection(FIRESTORE_DB, 'users');
+            console.log("user again",userId)
+            const id = query(userRef, where('userId', '==', userId));
+            const idSnapshot = await getDocs(id)
+            if(!idSnapshot.empty) {
+                const userDoc = idSnapshot.docs[0]
+                const tripDataRef = await getDocs(query(collection(userDoc.ref, "trips"), orderBy('createdAt', 'asc')));
+                const storeTrips =  tripDataRef.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setTrips(storeTrips);
+            }
+            else{
+                console.log("No Trips collection")
+            }
         } catch (error) {
             console.error('Error getting trips:', error);
         }
@@ -34,6 +54,8 @@ export default function TripListScreen({navigation}) {
     const [selectionMode, setSelectionMode] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
 
+
+    /*
     const trips = [
         {
             id: 1,
@@ -148,7 +170,7 @@ export default function TripListScreen({navigation}) {
             dist: 1100,
         },
     ];
-
+    */
     const toggleSelection = (id) => {
         if (selectedItems.includes(id)) {
             setSelectedItems(selectedItems.filter(itemId => itemId !== id));
@@ -180,15 +202,15 @@ export default function TripListScreen({navigation}) {
                         <View style={styles.tripDataContainerRow}>
                             <Text style={styles.tripText}>{item.date}   </Text>
                             <View style={styles.divider}></View>
-                            <Text style={styles.tripText}>   {item.start}</Text>
+                            <Text style={styles.tripText}>   {item.startLoc}</Text>
                             <Ionicons name="chevron-forward" size={30} color="#f2d15f"/>
-                            <Text style={styles.tripText}>{item.end} </Text>
+                            <Text style={styles.tripText}>{item.endLoc} </Text>
                         </View>
                         <View style={styles.tripDataContainerRow}>
+                            <Ionicons name="time-outline" size={30} color="#f2d15f"/>
+                            <Text style={styles.tripNums}> {item.time}</Text>
                             <Ionicons name="car-sharp" size={30} color="#f2d15f"/>
-                            <Text style={styles.tripNums}> {item.mileage}mi/gal </Text>
-                            <Ionicons name="car-sharp" size={30} color="#f2d15f"/>
-                            <Text style={styles.tripNums}> {item.dist}mi</Text>
+                            <Text style={styles.tripDis}> {item.distance}mi</Text>
                         </View>
                     </View>
                 </View>
@@ -356,6 +378,12 @@ const styles = StyleSheet.create({
         marginVertical: 10, 
     },
     tripNums: {
+        color: '#FFFFFF',
+        fontSize: 20, 
+        marginVertical: 10,
+        marginRight: 10 
+    },
+    tripDis: {
         color: '#FFFFFF',
         fontSize: 20, 
         marginVertical: 10, 

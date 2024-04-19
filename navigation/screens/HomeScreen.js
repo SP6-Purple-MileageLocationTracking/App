@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import React, {useState, useRef, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, serverTimestamp } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import { userId } from '../../FirebaseConfig';
 
@@ -24,9 +24,13 @@ export default function HomeScreen({navigation}) {
     const [startLoc, setStartLoc] = useState('')
     const [endLoc, setEndLoc] = useState('')
     const [time, setTime] = useState(0)
-    const [displayTime, setDisplayTime] = useState('')
+    const [displayTime, setDisplayTime] = useState('00:00:00')
     const countRef = useRef(null);
     const [dis, setDis] = useState(0)
+
+    useEffect(() => {
+        setDisplayTime(timer(time));
+    }, [time]);
 
     function StartTrip() {
         //put start location code here -S
@@ -98,7 +102,8 @@ export default function HomeScreen({navigation}) {
                     startLoc: startLoc,
                     endLoc: endLoc,
                     time: displayTime, 
-                    distance: dis
+                    distance: dis,
+                    createdAt: serverTimestamp()
                 });
             }
             console.log('Trip data added successfully');
