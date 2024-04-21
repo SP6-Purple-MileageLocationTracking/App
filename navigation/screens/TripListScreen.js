@@ -54,7 +54,7 @@ export default function TripListScreen({navigation}) {
     const [selectionMode, setSelectionMode] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
 
-
+    //TEST TRIPS
     /*
     const trips = [
         {
@@ -180,7 +180,7 @@ export default function TripListScreen({navigation}) {
     };
 
     const OneTrip = React.memo(( {item} ) => {
-        console.log("Rendering Trip:", item);
+        //console.log("Rendering Trip:", item);
             return(
                 <View style={styles.tripContainer} key={item.id}>
                     {!selectionMode && (
@@ -223,11 +223,22 @@ export default function TripListScreen({navigation}) {
         setSelectionMode(selectMode => !selectMode);
     };
 
-    const checked = () => {
+    const onPressCreatePDF = () => {
+        console.log('pdf Pressed')
+        setSelectionMode(selectMode => !selectMode);
+        const selectedTrips = selectedItems.map(itemId => {
+            return trips.find(item => item.id === itemId);
+        });
 
+    
+        selectedTrips.forEach(selectedTrip => {
+            console.log(selectedTrip);
+        });
+
+        //This is the function that will create a pdf, make sure to use selectedTrips
+        //for pdf creation, it is a list of trips with all the info for each trip within it
     };
 
-    console.log("Trips:", trips); // Log the entire trips array
 
     /*for the search bar -Alex*/
 
@@ -342,6 +353,19 @@ export default function TripListScreen({navigation}) {
                     keyExtractor={(item) => item.id.toString()}
                 />
             </SafeAreaView>
+
+            
+            {selectionMode && (
+                <SafeAreaView style={styles.uploadOverlay}>
+                    <Text style={styles.overlayText}>{selectedItems.length}</Text>
+                    <Text style={styles.overlayText}>Trips Selected</Text>
+                    <TouchableOpacity onPress={onPressCreatePDF} style={styles.pdf}>
+                        <Text style={styles.pdfText}>Create PDF</Text>
+                        <Ionicons name="document-outline" size={25} color="#211D26" />
+                    </TouchableOpacity>
+                </SafeAreaView>
+            )}
+            
         
             
         </SafeAreaView>
@@ -396,7 +420,7 @@ const styles = StyleSheet.create({
     },
     listContainer:{
         maxHeight:'83%',
-        bottom: '20%',
+        bottom: '30%',
     },
     headerContainer:{
         position: 'relative',
@@ -443,11 +467,45 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderColor:"#211D26",
         borderRadius: 20,
-        top: '30%',
+        top: '20%',
+        
     },
     checkBox: {
         padding: 0
     },
+    uploadOverlay: {
+        width: '100%',
+        flexDirection: 'row',
+        height: '8%',
+        backgroundColor: '#211D26',
+        position: 'absolute',
+        bottom: 0,
+    },
+    pdf: {
+        backgroundColor: '#f2d15f',
+        flexDirection: 'row',
+        marginRight: 15,
+        marginLeft: 80,
+        marginVertical: 10,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '30%',
+        padding: 5,
+        right: '10',
+    },
+    pdfText: {
+        fontSize: 15,
+        color: "#201d25",
+        marginLeft: 5,
+    },
+    overlayText: {
+        fontSize: 20,
+        color: "#FFFFFF",
+        marginLeft: 15,
+        marginVertical: 15,
+    },
+
 
 
   });
