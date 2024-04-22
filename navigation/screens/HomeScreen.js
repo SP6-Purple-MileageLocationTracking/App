@@ -2,24 +2,28 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
+//import Geolocation from 'react-native-geolocation-service';
 import {
     StyleSheet, Button, View, SafeAreaView,
-    Text, Alert, TouchableOpacity, 
+    Text, Alert, TouchableOpacity, PermissionsAndroid 
 } from 'react-native';
 import React, {useState, useRef, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { collection, addDoc, getDocs, query, where, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, serverTimestamp, setLogLevel } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import { userId } from '../../FirebaseConfig';
+import { hasServicesEnabledAsync } from 'expo-location';
 
 
 
 export default function HomeScreen({navigation}) {
-
+    const [location, setLocation] = useState(null);
+    const [startLocation, setStartLocation] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [latitude, setLatitude] = useState(null);
+    const [longitude, setLongitude] = useState(null);
     const [tripStarted, setTripStarted] = useState(false)
     const [tripPlay, setTripPlay] = useState(false)
-    const [location, setLocation] = useState(null);
-    const [errorMsg, setErrorMsg] = useState(null);
     const [date, setDate] = useState('')
     const [startLoc, setStartLoc] = useState('')
     const [endLoc, setEndLoc] = useState('')
@@ -31,6 +35,22 @@ export default function HomeScreen({navigation}) {
     useEffect(() => {
         setDisplayTime(timer(time));
     }, [time]);
+
+    const getLocation = async () => {
+        try {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+
+            if (status !== "granted") {
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            //console.log(location)
+            setLocation(location);
+        } catch (error) {
+            console.error("Error requesting location permission:", error);
+        }
+    };
 
     function StartTrip() {
         //put start location code here -S
@@ -46,10 +66,19 @@ export default function HomeScreen({navigation}) {
         setTripPlay(true);
         setTripStarted(true);
 
-
-        if (Location.isBackgroundLocationAvailableAsync) {
+        if (hasServicesEnabledAsync) {
             console.log("Location is Enabled");
-        } else if (!Location.isBackgroundLocationAvailableAsync) {
+            getLocation();
+            //setLatitude(location.coords.latitude);
+            //setLongitude(location.coords.longitude);
+            setStartLocation(location.coords);
+            let startLocation = location;
+            console.log(startLocation);
+            console.log("~~~~~");
+            let startLocationLat = startLocation.coords.latitude;
+            let startLocationLong = startLocation.coords.longitude;
+            console.log("Start Location Latitute / Longitude: " + startLocationLat + " / " + startLocationLong);
+        } else if (!hasServicesEnabledAsync) {
             console.log("Location is not Enabled");
         }
 
@@ -86,6 +115,19 @@ export default function HomeScreen({navigation}) {
         console.log('End Pressed')
         setTripPlay(false);
         setTripStarted(false);
+
+
+        getLocation();
+        //setLatitude(location.coords.latitude);
+        //setLongitude(location.coords.longitude);
+        //endStartLocation(location.coords);
+        let endLocation = location;
+        console.log(startLocation);
+        console.log("~~~~~");
+        let endLocationLat = endLocation.coords.latitude;
+        let endLocationLong = endLocation.coords.longitude;
+        console.log("End Location Latitute / Longitude: " + endLocationLat + " / " + endLocationLong);
+
     };
 
     const saveTripData =  async () => {

@@ -10,6 +10,10 @@ buildscript {
         kotlinVersion = "1.9.22"
 
         ndkVersion = "25.1.8937393"
+        // Any of the following will work
+         googlePlayServicesVersion      = "17.0.0"
+        // playServicesVersion         = "17.0.0"
+        // playServicesLocationVersion = "17.0.0"
     }
     repositories {
         google()
