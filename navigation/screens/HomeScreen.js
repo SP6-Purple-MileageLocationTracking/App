@@ -22,6 +22,10 @@ export default function HomeScreen({navigation}) {
     const [errorMsg, setErrorMsg] = useState(null);
     const [latitude, setLatitude] = useState(null);
     const [longitude, setLongitude] = useState(null);
+    const [startLocLat, setStartLocLat] = useState(null);
+    const [startLocLong, setStartLocLong] = useState(null);
+    const [endLocLat, setEndLocLat] = useState(null);
+    const [endLocLong, setEndLocLong] = useState(null);
     const [tripStarted, setTripStarted] = useState(false)
     const [tripPlay, setTripPlay] = useState(false)
     const [date, setDate] = useState('')
@@ -77,6 +81,8 @@ export default function HomeScreen({navigation}) {
             console.log("~~~~~");
             let startLocationLat = startLocation.coords.latitude;
             let startLocationLong = startLocation.coords.longitude;
+            setStartLocLat(startLocationLat);
+            setStartLocLong(startLocationLong);
             console.log("Start Location Latitute / Longitude: " + startLocationLat + " / " + startLocationLong);
         } else if (!hasServicesEnabledAsync) {
             console.log("Location is not Enabled");
@@ -126,6 +132,8 @@ export default function HomeScreen({navigation}) {
         console.log("~~~~~");
         let endLocationLat = endLocation.coords.latitude;
         let endLocationLong = endLocation.coords.longitude;
+        setEndLocLat(endLocationLat);
+        setEndLocLong(endLocationLong);
         console.log("End Location Latitute / Longitude: " + endLocationLat + " / " + endLocationLong);
 
     };
@@ -143,6 +151,10 @@ export default function HomeScreen({navigation}) {
                     date: date,
                     startLoc: startLoc,
                     endLoc: endLoc,
+                    startLocLat: startLocLat,
+                    startLocLong: startLocLong,
+                    endLocLat: endLocLat,
+                    endLocLong: endLocLong,
                     time: displayTime, 
                     distance: dis,
                     createdAt: serverTimestamp()
