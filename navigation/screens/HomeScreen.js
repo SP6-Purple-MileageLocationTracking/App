@@ -2,6 +2,8 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
+import * as TaskManager from 'expo-task-manager';
+import * as Notifications from 'expo-notifications';
 //import Geolocation from 'react-native-geolocation-service';
 import {
     StyleSheet, Button, View, SafeAreaView,
@@ -14,14 +16,15 @@ import { FIRESTORE_DB } from '../../FirebaseConfig';
 import { userId } from '../../FirebaseConfig';
 import { hasServicesEnabledAsync } from 'expo-location';
 
+Location.setGoogleApiKey("AIzaSyDCPuhY1_x2p9wCwUBtoy4ZDhNmoPSlpNY")
+
+
 
 
 export default function HomeScreen({navigation}) {
-    const [location, setLocation] = useState(null);
-    const [startLocation, setStartLocation] = useState(null);
+    
+    
     const [errorMsg, setErrorMsg] = useState(null);
-    const [latitude, setLatitude] = useState(null);
-    const [longitude, setLongitude] = useState(null);
     const [startLocLat, setStartLocLat] = useState(null);
     const [startLocLong, setStartLocLong] = useState(null);
     const [endLocLat, setEndLocLat] = useState(null);
@@ -36,61 +39,126 @@ export default function HomeScreen({navigation}) {
     const countRef = useRef(null);
     const [dis, setDis] = useState(0)
 
+
+    //Don't Move
+    const [location, setLocation] = useState(null);
+    const [rawStartLocation, setRawStartLocation] = useState(null);
+    const [rawendLocation, setRawEndLocation] = useState(null);
+
+
     useEffect(() => {
         setDisplayTime(timer(time));
+
     }, [time]);
 
-    const getLocation = async () => {
-        try {
-            let { status } = await Location.requestForegroundPermissionsAsync();
+    TaskManager.defineTask("LOCATION_TASK_NAME", ({ data: { locations }, error }) => {
+        if (error) {
+            // check `error.message` for more details.
+            return;
+        }
+        console.log('Received new locations', locations);
+    });
 
-            if (status !== "granted") {
+
+    const startLocationTracking = async () => {
+        await Location.startLocationUpdatesAsync("LOCATION_TASK_NAME", {
+            accuracy: Location.Accuracy.Highest,
+            timeInterval: 1000,
+            distanceInterval: 0,
+            showsBackgroundLocationIndicator: true,
+            foregroundService: {
+                notificationTitle: "Location Tracking",
+                notificationBody: "Tracking Location for Time vs Milage Calculation.",
+                notificationColor: "#FF0000",
+            },
+            pausesUpdatesAutomatically: false,
+            deferredUpdatesInterval: 1000,
+            deferredUpdatesDistance: 0,
+            deferredUpdatesTimeout: 1000,
+        });
+    };
+
+
+    //FIXED onPressStart!!!
+    const onPressStart = async () => {
+        try {
+            const { status } = await Location.requestBackgroundPermissionsAsync();
+
+            if (status !== 'granted') {
+                console.log("Location Permission Denied");
                 return;
             }
+            const location = await Location.getCurrentPositionAsync({});
+            console.log('Start location:', location.coords.latitude, location.coords.longitude);
 
-            let location = await Location.getCurrentPositionAsync({});
-            //console.log(location)
-            setLocation(location);
+            //Setting Start Location State Variables
+            setStartLocLat(location.coords.latitude);
+            setStartLocLong(location.coords.longitude);
+
+            //Setting Raw Starting Location Data
+            setRawStartLocation(location);
+
+            setDate('3/6/24');
+            setStartLoc('Tampa, FL')
+            countRef.current = setInterval(() => {
+                setTime((time) => time + 1);
+            }, 1000);
+
+            setDis(472.2)
+            //
+            console.log('Start Pressed')
+            setTripPlay(true);
+            setTripStarted(true);
+
         } catch (error) {
-            console.error("Error requesting location permission:", error);
+            console.error('Error starting trip:', error);
+            // Handle error (e.g., show alert)
         }
     };
 
-    function StartTrip() {
-        //put start location code here -S
-        setDate('3/6/24');
-        setStartLoc('Tampa, FL')
-        countRef.current = setInterval(() => {
-            setTime((time) => time + 1);
-        }, 1000);
+    //FIXED onPressEnd!!!
+    const onPressEnd = async () => {
+        //the end button will send trip data to the database
+        //put that code here (return displayTime to database not Time,
+        //time stores raw seconds while displayTime is formated) -S
+        try {
+            // Stopping Timer
+            setDisplayTime(timer(time))
+            clearInterval(countRef.current);
 
-        setDis(472.2)
-        //
-        console.log('Start Pressed')
-        setTripPlay(true);
-        setTripStarted(true);
+            //Fetching End Location Data
+            const { status } = await Location.requestBackgroundPermissionsAsync();
 
-        if (hasServicesEnabledAsync) {
-            console.log("Location is Enabled");
-            getLocation();
-            //setLatitude(location.coords.latitude);
-            //setLongitude(location.coords.longitude);
-            setStartLocation(location.coords);
-            let startLocation = location;
-            console.log(startLocation);
-            console.log("~~~~~");
-            let startLocationLat = startLocation.coords.latitude;
-            let startLocationLong = startLocation.coords.longitude;
-            setStartLocLat(startLocationLat);
-            setStartLocLong(startLocationLong);
-            console.log("Start Location Latitute / Longitude: " + startLocationLat + " / " + startLocationLong);
-        } else if (!hasServicesEnabledAsync) {
-            console.log("Location is not Enabled");
+            if (status !== 'granted') {
+                console.log("Location Permission Denied");
+                return;
+            }
+            const location = await Location.getCurrentPositionAsync({});
+            console.log('Start location:', location.coords.latitude, location.coords.longitude);
+
+            //Setting End Location State Variables
+            setEndLocLat(location.coords.latitude);
+            setEndLocLong(location.coords.longitude);
+
+            //Setting Raw End Location Data
+            setRawEndLocation(location);
+            console.log(location);
+            //Saving Trip Data to Firestore
+            saveTripData();
+
+            //Resetting Trip-related State Variables
+            setTripStarted(false);
+            setTripPlay(false);
+            setTime(0);
+
+            
+
+            console.log('Trip ended successfully');
+
+        } catch (error) {
+            console.log("Error Ending Trip");
         }
-
-    }
-    const onPressStart = () => {
-        StartTrip()
+        console.log('End Pressed');
     };
 
     const onPressPause = () => {
@@ -109,34 +177,7 @@ export default function HomeScreen({navigation}) {
         console.log('Play Pressed')
     };
 
-    const onPressEnd = () => {
-        //the end button will send trip data to the database
-        //put that code here (return displayTime to database not Time, 
-        //time stores raw seconds while displayTime is formated) -S
-        saveTripData();
 
-        setDisplayTime(timer(time))
-        clearInterval(countRef.current);
-        setTime(0);
-        console.log('End Pressed')
-        setTripPlay(false);
-        setTripStarted(false);
-
-
-        getLocation();
-        //setLatitude(location.coords.latitude);
-        //setLongitude(location.coords.longitude);
-        //endStartLocation(location.coords);
-        let endLocation = location;
-        console.log(startLocation);
-        console.log("~~~~~");
-        let endLocationLat = endLocation.coords.latitude;
-        let endLocationLong = endLocation.coords.longitude;
-        setEndLocLat(endLocationLat);
-        setEndLocLong(endLocationLong);
-        console.log("End Location Latitute / Longitude: " + endLocationLat + " / " + endLocationLong);
-
-    };
 
     const saveTripData =  async () => {
         try {

@@ -13,6 +13,7 @@ import Login from './navigation/screens/Login';
 import CreateAccount from './navigation/screens/CreateAccountScreen';
 import PDFGenerator from './navigation/screens/PDFGenerator'
 import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,7 +31,14 @@ export default function App() {
       }
 
       let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+        setLocation(location);
+        let resn = await Notifications.requestPermissionsAsync();
+        if (resn.status != 'granted') {
+            //handle it
+        } else {
+            console.log('Notifications granted');
+        }
+
     })();
   }, []);
 
