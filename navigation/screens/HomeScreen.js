@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import * as Notifications from 'expo-notifications';
+import axios from 'axios';
 //import Geolocation from 'react-native-geolocation-service';
 import {
     StyleSheet, Button, View, SafeAreaView,
@@ -16,19 +17,32 @@ import { FIRESTORE_DB } from '../../FirebaseConfig';
 import { userId } from '../../FirebaseConfig';
 import { hasServicesEnabledAsync } from 'expo-location';
 
-Location.setGoogleApiKey("AIzaSyDCPuhY1_x2p9wCwUBtoy4ZDhNmoPSlpNY")
 
+const GOOGLE_MAPS_API_KEY = 'AIzaSyDCPuhY1_x2p9wCwUBtoy4ZDhNmoPSlpNY';
+Location.setGoogleApiKey(GOOGLE_MAPS_API_KEY);
 
+const getLocationFromCoords = async (latitude, longitude) => {
+    try {
+        const response = await axios.get(
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`
+        );
+
+        if (response.data && response.data.results && response.data.results.length > 0) {
+            const locationInfo = response.data.results[0];
+            const formattedAddress = locationInfo.formatted_address;
+            return formattedAddress;
+        } else {
+            return 'Location not found';
+        }
+    } catch (error) {
+        console.error('Error fetching location:', error);
+        return 'Error fetching location';
+    }
+};
 
 
 export default function HomeScreen({navigation}) {
-    
-    
     const [errorMsg, setErrorMsg] = useState(null);
-    const [startLocLat, setStartLocLat] = useState(null);
-    const [startLocLong, setStartLocLong] = useState(null);
-    const [endLocLat, setEndLocLat] = useState(null);
-    const [endLocLong, setEndLocLong] = useState(null);
     const [tripStarted, setTripStarted] = useState(false)
     const [tripPlay, setTripPlay] = useState(false)
     const [date, setDate] = useState('')
@@ -39,12 +53,19 @@ export default function HomeScreen({navigation}) {
     const countRef = useRef(null);
     const [dis, setDis] = useState(0)
 
-
     //Don't Move
     const [location, setLocation] = useState(null);
     const [rawStartLocation, setRawStartLocation] = useState(null);
-    const [rawendLocation, setRawEndLocation] = useState(null);
-
+    const [rawEndLocation, setRawEndLocation] = useState(null);
+    const [startAddress, setStartAddress] = useState('');
+    const [endAddress, setEndAddress] = useState('');
+    const [startLocLat, setStartLocLat] = useState(null);
+    const [startLocLong, setStartLocLong] = useState(null);
+    const [endLocLat, setEndLocLat] = useState(null);
+    const [endLocLong, setEndLocLong] = useState(null);
+    const [isTracking, setIsTracking] = useState(false);
+    const [currentLocation, setCurrentLocation] = useState(null);
+    const intervalRef = useRef(null);
 
     useEffect(() => {
         setDisplayTime(timer(time));
@@ -59,23 +80,53 @@ export default function HomeScreen({navigation}) {
         console.log('Received new locations', locations);
     });
 
-
+    // Function to start location tracking
     const startLocationTracking = async () => {
-        await Location.startLocationUpdatesAsync("LOCATION_TASK_NAME", {
-            accuracy: Location.Accuracy.Highest,
-            timeInterval: 1000,
-            distanceInterval: 0,
-            showsBackgroundLocationIndicator: true,
-            foregroundService: {
-                notificationTitle: "Location Tracking",
-                notificationBody: "Tracking Location for Time vs Milage Calculation.",
-                notificationColor: "#FF0000",
-            },
-            pausesUpdatesAutomatically: false,
-            deferredUpdatesInterval: 1000,
-            deferredUpdatesDistance: 0,
-            deferredUpdatesTimeout: 1000,
-        });
+        try {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+
+            if (status !== 'granted') {
+                console.log('Location permission denied');
+                return;
+            }
+
+            setIsTracking(true);
+
+            // Start continuous location updates
+            Location.startLocationUpdatesAsync('LOCATION_TASK_NAME', {
+                accuracy: Location.Accuracy.Highest,
+                distanceInterval: 10, // Minimum distance (in meters) to trigger location update
+            });
+
+            // Set interval to update current location and log to console
+            intervalRef.current = setInterval(async () => {
+                const location = await Location.getLastKnownPositionAsync();
+                setCurrentLocation(location);
+
+                if (location) {
+                    console.log('Current Location:', {
+                        latitude: location.coords.latitude,
+                        longitude: location.coords.longitude,
+                    });
+                }
+            }, 5000); // Update location and log every 5 seconds (adjust as needed)
+        } catch (error) {
+            console.error('Error starting location tracking:', error);
+        }
+    };
+
+    // Function to stop location tracking
+    const stopLocationTracking = async () => {
+        try {
+            setIsTracking(false);
+
+            // Stop location updates and clear interval
+            await Location.stopLocationUpdatesAsync('LOCATION_TASK_NAME');
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        } catch (error) {
+            console.error('Error stopping location tracking:', error);
+        }
     };
 
 
@@ -89,26 +140,43 @@ export default function HomeScreen({navigation}) {
                 return;
             }
             const location = await Location.getCurrentPositionAsync({});
-            console.log('Start location:', location.coords.latitude, location.coords.longitude);
+            const { latitude, longitude } = location.coords;
 
-            //Setting Start Location State Variables
-            setStartLocLat(location.coords.latitude);
-            setStartLocLong(location.coords.longitude);
-
-            //Setting Raw Starting Location Data
+            // Setting Start Location State Variables
+            setStartLocLat(latitude);
+            setStartLocLong(longitude);
             setRawStartLocation(location);
 
-            setDate('3/6/24');
-            setStartLoc('Tampa, FL')
+            // Fetching and setting the starting address and getting current date
+            const address = await getLocationFromCoords(latitude, longitude);
+            setStartAddress(address);
+            const currentDate = new Date().toLocaleDateString();
+
+            // Extract city and state from the address (assuming address format is "City, State, Country")
+            const addressParts = address.split(', ');
+            const cityState = `${addressParts[1]}, ${addressParts[2]}`; // City, State
+
+            // Displaying the starting address in the console
+            console.log('Starting Address:', address);
+
+            // Additional logic for starting the trip...
+            setDate(currentDate);
+            setStartLoc(cityState);
             countRef.current = setInterval(() => {
                 setTime((time) => time + 1);
             }, 1000);
 
-            setDis(472.2)
-            //
-            console.log('Start Pressed')
+            setDis(472.2);
+
+            console.log('Start Pressed');
+            console.log('Start Location Latitude / Longitude:', latitude, longitude);
             setTripPlay(true);
             setTripStarted(true);
+
+
+
+            //Location Tracking
+            startLocationTracking();
 
         } catch (error) {
             console.error('Error starting trip:', error);
@@ -118,48 +186,64 @@ export default function HomeScreen({navigation}) {
 
     //FIXED onPressEnd!!!
     const onPressEnd = async () => {
-        //the end button will send trip data to the database
-        //put that code here (return displayTime to database not Time,
-        //time stores raw seconds while displayTime is formated) -S
         try {
-            // Stopping Timer
-            setDisplayTime(timer(time))
+            // Stop the timer and update display time
+            setDisplayTime(timer(time));
             clearInterval(countRef.current);
 
-            //Fetching End Location Data
-            const { status } = await Location.requestBackgroundPermissionsAsync();
+            // Request foreground location permissions
+            const { status } = await Location.requestForegroundPermissionsAsync();
 
             if (status !== 'granted') {
-                console.log("Location Permission Denied");
+                console.log('Location permission denied');
                 return;
             }
+
+            // Fetch current position (end location)
             const location = await Location.getCurrentPositionAsync({});
-            console.log('Start location:', location.coords.latitude, location.coords.longitude);
+            const { latitude, longitude } = location.coords;
 
-            //Setting End Location State Variables
-            setEndLocLat(location.coords.latitude);
-            setEndLocLong(location.coords.longitude);
+            console.log('End location:', latitude, longitude);
 
-            //Setting Raw End Location Data
+            // Fetch address from coordinates
+            const address = await getLocationFromCoords(latitude, longitude);
+
+            console.log('Ending Address:', address);
+
+            // Extract city and state from the address (assuming address format is "City, State, Country")
+            const addressParts = address.split(', ');
+            const cityState = `${addressParts[1]}, ${addressParts[2]}`; // City, State
+
+            console.log('End Location (City, State):', cityState);
+
+            // Update state variables for end location
+            setEndLoc(cityState);
+            setEndLocLat(latitude);
+            setEndLocLong(longitude);
             setRawEndLocation(location);
-            console.log(location);
-            //Saving Trip Data to Firestore
-            saveTripData();
 
-            //Resetting Trip-related State Variables
+            console.log('End Location State Variables:', endLoc, endLocLat, endLocLong);
+
+            // Save trip data to Firestore
+            await saveTripData();
+
+            // Reset trip-related state variables after saving trip data
             setTripStarted(false);
             setTripPlay(false);
             setTime(0);
 
-            
-
             console.log('Trip ended successfully');
 
+
+            //end Tracking 
+            stopLocationTracking();
+
         } catch (error) {
-            console.log("Error Ending Trip");
+            console.error('Error ending trip:', error);
         }
         console.log('End Pressed');
     };
+
 
     const onPressPause = () => {
         //Stop keeping track of time/location when this button is pressed -S
@@ -176,7 +260,6 @@ export default function HomeScreen({navigation}) {
         setTripPlay(true);
         console.log('Play Pressed')
     };
-
 
 
     const saveTripData =  async () => {
