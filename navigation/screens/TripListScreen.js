@@ -260,74 +260,33 @@ export default function TripListScreen({navigation}) {
 
 
     /*for the search bar -Alex*/
+const [searchQuery, setSearchQuery] = useState('');
 
-    /*
-    const [isLoading, setIsLoading] = useState(false);
-    const [data, setData] = useState([]);
-    const [error, setError] = useState(null);
-    const [fullData, setFullData] = useState([]);
-     const [searchQuery, setSearchQuery] = useState("");
-    */
-     
-     /*
-     useEffect(() => {
-        setIsLoading(true);
-        fetchData(API_ENDPOINT);
-     }, []);
-    */
+//handles changes in the query
+const handleSearch = (query) => {
+  setSearchQuery(query);
+};
 
-     /*This will fetch  */
-     /*
-     const fetchData = async(url) => {
-        try {
-            const response = await fetch(url);
-            const json = await respond.json();
-            setData(json.results);
+//filteredTrips is the trips based on what you type in the search bar
+const filteredTrips = trips.filter(trip =>
+  trip.startLoc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  trip.endLoc.toLowerCase().includes(searchQuery.toLowerCase())
+);
 
-            console.log(json.results);
-            setIsLoading(false);
 
-        }catch(error)
-        {
-            setError(error);
-            console.log(error)
-            setIsLoading(false);
-        }
-     }
-    const handleSearch = (query) =>{
-        setSearchQuery(query);
-    }
-
-    if ( isLoading )
-    {
-        return (
-            <View style = {{flex:1, justifyContent: 'center', alignItems: 'center'}}>
-            <ActivityIndicator size={'large'} color ="#5500dc" />
-            </View>
-        );
-    }
-
-    if( error ) {
-        return (
-            <View style = {{flex:1, justifyContent:'center', alignItems:'center'}}>
-                <Text> Error in fetching data ...</Text>
-            </View>
-        )
-    }
-    */
     return(
         <SafeAreaView style={styles.container}>
             
             <SafeAreaView style={styles.top}>
                 <TextInput 
-                style={styles.searchBox}
+                style={[styles.searchBox, { color: '#f2d15f' }]}
                 placeholder="Search"
                 clearButtonMode ="always"
                 autoCapitalize = "none"
                 autoCorrect={false}
                 placeholderTextColor={"#f2d15f"}
-                //value = {searchQuery}
-                //onChangeText = {(query) => handleSearch(query)}
+                value = {searchQuery}
+                onChangeText = {(query) => handleSearch(query)}
                 />
 
                 {!selectionMode && (
@@ -342,24 +301,6 @@ export default function TripListScreen({navigation}) {
                 )}
             </SafeAreaView>        
                 
-                <FlatList
-                /* This isn't finished but this is supposed to go to the API to decide which trip to get -Alex
-
-                data = {data}
-                keyExtractor = {(item) => item.login.userName}
-                renderItem = {({item}) => (
-                    <View style={styles.listContainer}>
-                        <Image source ={{uri: item.picture.thumbnail}} />
-                        <View>
-                            <Text>{item.name.first} {item.name.last}</Text>
-                            <Text>{item.email}</Text>
-                        </View>
-                    </View>
-                )}
-                */
-            />
-            
-
             <View style={styles.headerContainer}>
                 <Text style={styles.tripText}></Text>
             </View>
@@ -367,7 +308,7 @@ export default function TripListScreen({navigation}) {
             <SafeAreaView style={styles.listSection}>
                 <FlatList
                     style={styles.listContainer}
-                    data = {trips}
+                    data = {filteredTrips}
                     renderItem={({ item }) => <OneTrip item={item} />}
                     keyExtractor={(item) => item.id.toString()}
                 />
