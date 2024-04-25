@@ -52,6 +52,7 @@ export default function HomeScreen({navigation}) {
     const [displayTime, setDisplayTime] = useState('00:00:00')
     const countRef = useRef(null);
     const [dis, setDis] = useState(0)
+    const [disableButton, setDisableButton] = useState(false)
 
     //Don't Move
     const [location, setLocation] = useState(null);
@@ -187,6 +188,7 @@ export default function HomeScreen({navigation}) {
     //FIXED onPressEnd!!!
     const onPressEnd = async () => {
         try {
+            setDisableButton(true);
             // Stop the timer and update display time
             setDisplayTime(timer(time));
             clearInterval(countRef.current);
@@ -216,16 +218,12 @@ export default function HomeScreen({navigation}) {
 
             console.log('End Location (City, State):', cityState);
 
-            // Update state variables for end location
-            setEndLoc(cityState);
-            setEndLocLat(latitude);
-            setEndLocLong(longitude);
-            setRawEndLocation(location);
+            
 
             console.log('End Location State Variables:', endLoc, endLocLat, endLocLong);
 
             // Save trip data to Firestore
-            await saveTripData();
+            await saveTripData(cityState,latitude,longitude,location);
 
             // Reset trip-related state variables after saving trip data
             setTripStarted(false);
@@ -242,6 +240,7 @@ export default function HomeScreen({navigation}) {
             console.error('Error ending trip:', error);
         }
         console.log('End Pressed');
+        setDisableButton(false);
     };
 
 
@@ -262,7 +261,7 @@ export default function HomeScreen({navigation}) {
     };
 
 
-    const saveTripData =  async () => {
+    const saveTripData =  async (cityState,latitude,longitude) => {
         try {
             const userRef = collection(FIRESTORE_DB, 'users');
             console.log("user again",userId)
@@ -274,11 +273,11 @@ export default function HomeScreen({navigation}) {
                 const tripDocRef = await addDoc(tripDataRef, {
                     date: date,
                     startLoc: startLoc,
-                    endLoc: endLoc,
+                    endLoc: cityState,
                     startLocLat: startLocLat,
                     startLocLong: startLocLong,
-                    endLocLat: endLocLat,
-                    endLocLong: endLocLong,
+                    endLocLat: latitude,
+                    endLocLong: longitude,
                     time: displayTime, 
                     distance: dis,
                     createdAt: serverTimestamp()
@@ -349,7 +348,7 @@ export default function HomeScreen({navigation}) {
                     </TouchableOpacity>
                     )}
 
-                    <TouchableOpacity onPress={onPressEnd} style={styles.tripButtons}>
+                    <TouchableOpacity onPress={onPressEnd} style={styles.tripButtons} disabled={disableButton}>
                         <Ionicons name="stop-circle-outline" size={40} color="#f2d15f" />
                         <Text style={styles.startText}>End Trip</Text>
                     </TouchableOpacity>
@@ -370,9 +369,10 @@ const styles = StyleSheet.create({
     currentTrip: {
         width: '90%',
         flexDirection: 'row',
-        height: '30%',
+        minHeight: '30%',
         backgroundColor: '#211D26',
         borderRadius: 20,
+        paddingVertical: 20
     },
     startTrip: {
         width: "50%",
