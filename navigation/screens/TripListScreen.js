@@ -181,15 +181,34 @@ export default function TripListScreen({navigation}) {
 
     const OneTrip = React.memo(( {item} ) => {
         //console.log("Rendering Trip:", item);
+
+        //altering date and locations so they fit in the container
+        const start = item.startLoc
+        const startCity = start.substring(0,4);
+        const splitStart = start.split(',');
+        const startState = splitStart[1].substring(0,3);
+        
+        const end = item.endLoc
+        const endCity = end.substring(0,4);
+        const splitEnd = end.split(',');
+        const endState = splitEnd[1].substring(0,3);
+
+        const date = item.date
+        const splitDate = date.split('/')
+        const month = splitDate[0];
+        const day = splitDate[1];
+        const year = splitDate[2].substring(2); 
+        
+
             return(
                 <View style={styles.tripContainer} key={item.id}>
                     {!selectionMode && (
-                        <Ionicons name="location-sharp" size={50} color="#f2d15f" />
+                        <Ionicons name="location-sharp" size={35} color="#f2d15f" />
                     )}
                     {selectionMode && (
                         <CheckBox
                             onPress={() => toggleSelection(item.id)}
-                            size={30}
+                            size={25}
                             checkedIcon='check-square'
                             uncheckedIcon='square-o'
                             checkedColor='#f2d15f'
@@ -200,11 +219,11 @@ export default function TripListScreen({navigation}) {
                     )}
                     <View style={styles.tripDataContainer}>
                         <View style={styles.tripDataContainerRow}>
-                            <Text style={styles.tripText}>{item.date}   </Text>
+                            <Text style={styles.tripText}>{month}/{day}/{year}  </Text>
                             <View style={styles.divider}></View>
-                            <Text style={styles.tripText}>   {item.startLoc}</Text>
+                            <Text style={styles.tripText}>  {startCity}, {startState}</Text>
                             <Ionicons name="chevron-forward" size={30} color="#f2d15f"/>
-                            <Text style={styles.tripText}>{item.endLoc} </Text>
+                            <Text style={styles.tripText}>{endCity}, {endState} </Text>
                         </View>
                         <View style={styles.tripDataContainerRow}>
                             <Ionicons name="time-outline" size={30} color="#f2d15f"/>
@@ -394,12 +413,17 @@ const styles = StyleSheet.create({
     tripDataContainerRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: 20,
+        marginLeft: 10,
+    },
+    tripDataContainerCol: {
+        flexDirection: 'col',
+        alignItems: 'center',
+        marginHorizontal: 10 
     },
     tripText: {
         color: '#f2d15f',
-        fontSize: 24, 
-        marginVertical: 10, 
+        fontSize: 20, 
+        //marginVertical: 10, 
     },
     tripNums: {
         color: '#FFFFFF',
