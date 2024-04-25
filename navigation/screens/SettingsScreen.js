@@ -275,7 +275,7 @@ export default function SettingsScreen({navigation}) {
             )}
             {LoginScreen && (
             <View style={styles.container}>
-                 <View style={styles.header}>
+                 <View style={styles.headerWithoutBack}>
                     <Text style={styles.headerText}>Account</Text>
                 </View>
                 <View style={styles.line}></View>
@@ -318,6 +318,11 @@ const styles = StyleSheet.create({
         alignContent:'left',
         alignItems: 'center',
         marginLeft: -110,
+    },
+    headerWithoutBack: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignContent:'center',
     },
     backButton: {
         marginRight: 50,
