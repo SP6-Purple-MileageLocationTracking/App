@@ -9,7 +9,7 @@ import {
 import React, {useState, useRef, useEffect} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { getAuth, updatePassword, updateEmail } from "firebase/auth";
+import { getAuth, updatePassword, updateEmail, verifyBeforeUpdateEmail, reauthenticateWithCredential, EmailAuthProvider} from "firebase/auth";
 
 
 
@@ -18,11 +18,14 @@ export default function SettingsScreen({navigation}) {
     const [AccountScreen, setAccountScreen] = useState(false)
     const [PasswordScreen, setPasswordScreen] = useState(false)
     const [EmailScreen, setEmailScreen] = useState(false)
+    const [LoginScreen, setLoginScreen] = useState(false)
     const [CurrentScreen, setCurrentScreen] = useState('Settings')
     const [NewPassword, setNewPassword] = useState('')
     const [ConfirmPassword, setConfirmPassword] = useState('')
     const [NewEmail, setNewEmail] = useState('')
     const [ConfirmEmail, setConfirmEmail] = useState('')
+    const [Email, setEmail] = useState('')
+    const [Password, setPassword] = useState('')
     const auth = getAuth();
     const user = auth.currentUser;
 
@@ -80,7 +83,12 @@ export default function SettingsScreen({navigation}) {
                 setSettingsScreen(true)
                 setCurrentScreen('Settings')
               }).catch((error) => {
-                Alert.alert('Password length must be a minimum of 6 characters')
+                if (error.message == "Firebase: Error (auth/requires-recent-login).") {
+                    ReLogin()
+                }
+                else if (error.message == "Firebase: Password should be at least 6 characters (auth/weak-password)."){
+                    Alert.alert('Password should be at least 6 characters')
+                }
               });
         }
         else {
@@ -94,16 +102,21 @@ export default function SettingsScreen({navigation}) {
             Alert.alert('Email can\'t be empty')
         }
         else if (NewEmail == ConfirmEmail) {
-            updateEmail(user, NewEmail).then(() => {
-                Alert.alert('Email Set!')
+            verifyBeforeUpdateEmail(user, NewEmail).then(() => {
+                Alert.alert('Check new email acount for link to verify and confirm new email!')
                 setNewEmail('')
                 setConfirmEmail('')
                 setEmailScreen(false)
                 setSettingsScreen(true)
                 setCurrentScreen('Settings')
-              }).catch((error) => {
-                Alert.alert(error)
-              });
+                }).catch((error) => {
+                if (error.message == "Firebase: Error (auth/requires-recent-login).") {
+                    ReLogin()
+                }
+                else if (error.message == "Firebase: Error (auth/invalid-new-email)."){
+                    Alert.alert("Invalid Email Address")
+                }
+            });
         }
         else {
             Alert.alert('Emails don\'t match')
@@ -122,6 +135,38 @@ export default function SettingsScreen({navigation}) {
             console.error('Sign Out Error', error);
           });
     };
+
+    const ReLogin = () => {
+        if (CurrentScreen == "Password"){
+            setPasswordScreen(false)
+            setLoginScreen(true)
+        }
+        else if (CurrentScreen == "Email"){
+            setEmailScreen(false)
+            setLoginScreen(true)
+        }
+    }
+
+    const onPressLogin = () => {
+        credential = EmailAuthProvider.credential(
+            Email, 
+            Password
+        );
+        reauthenticateWithCredential(user, credential).then(() => {
+            if (CurrentScreen == "Email"){
+                setLoginScreen(false)
+                onPressSetEmail()
+            }
+            else if (CurrentScreen == "Password"){
+                setLoginScreen(false)
+                onPressSetPassword()
+            }
+            setEmail('')
+            setPassword('')
+            }).catch((error) => {
+            console.log(error.message)
+        });
+    }
 
     return(
 
@@ -225,6 +270,35 @@ export default function SettingsScreen({navigation}) {
                 </View>
                 <TouchableOpacity onPress={onPressSetEmail}>
                     <Text style={styles.loginText}>Set Email</Text>
+                </TouchableOpacity>
+            </View>
+            )}
+            {LoginScreen && (
+            <View style={styles.container}>
+                 <View style={styles.header}>
+                    <Text style={styles.headerText}>Account</Text>
+                </View>
+                <View style={styles.line}></View>
+                <Text style={styles.title}>Verify Login</Text>
+                <View style={styles.inputView}>
+                    <TextInput style={styles.inputText}
+                        placeholder="Current Email"
+                        placeholderTextColor="#f2d15f"
+                        autoCapitalize='none'
+                        onChangeText={text => setEmail(text)}
+                    />
+                </View>
+                <View style={styles.inputView}>
+                    <TextInput style={styles.inputText}
+                        secureTextEntry={true}
+                        placeholder="Current Password"
+                        placeholderTextColor="#f2d15f"
+                        autoCapitalize='none'
+                        onChangeText={text => setPassword(text)}
+                    />
+                </View>
+                <TouchableOpacity onPress={onPressLogin}>
+                    <Text style={styles.loginText}>Verify</Text>
                 </TouchableOpacity>
             </View>
             )}
