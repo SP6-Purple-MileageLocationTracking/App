@@ -81,7 +81,29 @@ export default function HomeScreen({navigation}) {
         console.log('Received new locations', locations);
     });
 
-    // Function to start location tracking
+    // Function to calculate distance between two coordinates using Haversine formula
+    const calculateDistance = async (prevLocation, newLocation) => {
+        try {
+            const R = 6371e3; // metres
+            const lat1 = prevLocation.latitude * Math.PI / 180; // in radians
+            const lat2 = newLocation.latitude * Math.PI / 180;
+            const latChange = (newLocation.latitude - prevLocation.latitude) * Math.PI / 180;
+            const longChange = (newLocation.longitude - prevLocation.longitude) * Math.PI / 180;
+
+            const a = Math.sin(latChange / 2) * Math.sin(latChange / 2) +
+                Math.cos(lat1) * Math.cos(lat2) *
+                Math.sin(longChange / 2) * Math.sin(longChange / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            const distance = R * c; // in meters
+            return distance;
+        } catch (error) {
+            console.error('Error calculating distance:', error);
+            return 0;
+        }
+    };
+
+
     const startLocationTracking = async () => {
         try {
             const { status } = await Location.requestForegroundPermissionsAsync();
@@ -99,16 +121,35 @@ export default function HomeScreen({navigation}) {
                 distanceInterval: 10, // Minimum distance (in meters) to trigger location update
             });
 
-            // Set interval to update current location and log to console
+            let prevLocation = null;
+
+            // Set interval to update current location and calculate distance traveled
             intervalRef.current = setInterval(async () => {
                 const location = await Location.getLastKnownPositionAsync();
                 setCurrentLocation(location);
 
                 if (location) {
-                    console.log('Current Location:', {
+                    // Calculate distance between current location and previous location
+                    if (prevLocation) {
+                        const newLocation = {
+                            latitude: location.coords.latitude,
+                            longitude: location.coords.longitude,
+                        };
+                        const distance = await calculateDistance(prevLocation, newLocation);
+                        // Convert distance from meters to miles
+                        const distanceInMiles = distance * 0.000621371; // 1 meter = 0.000621371 miles
+                        setDis(prevDistance => prevDistance + distanceInMiles); // Update distance traveled
+
+                        //Print Distance in Console
+                        console.log('Distance traveled:', distanceInMiles.toFixed(2), 'miles');
+
+                    }
+
+                    // Set current location as the new previous location
+                    prevLocation = {
                         latitude: location.coords.latitude,
                         longitude: location.coords.longitude,
-                    });
+                    };
                 }
             }, 5000); // Update location and log every 5 seconds (adjust as needed)
         } catch (error) {
@@ -167,18 +208,13 @@ export default function HomeScreen({navigation}) {
                 setTime((time) => time + 1);
             }, 1000);
 
-            setDis(472.2);
-
+            // Start location tracking
+            startLocationTracking();
+            setDis(0);
             console.log('Start Pressed');
             console.log('Start Location Latitude / Longitude:', latitude, longitude);
             setTripPlay(true);
             setTripStarted(true);
-
-
-
-            //Location Tracking
-            startLocationTracking();
-
         } catch (error) {
             console.error('Error starting trip:', error);
             // Handle error (e.g., show alert)
@@ -218,12 +254,13 @@ export default function HomeScreen({navigation}) {
 
             console.log('End Location (City, State):', cityState);
 
+            // Calculate Distance between Start and End in Meters
+            //const distance = await calculateDistance(rawStartLocation.coords, location.coords);
+
+            console.log("Total Distance Travelled: ", dis.toFixed(2), " miles.");
             
-
-            console.log('End Location State Variables:', endLoc, endLocLat, endLocLong);
-
             // Save trip data to Firestore
-            await saveTripData(cityState,latitude,longitude,location);
+            await saveTripData(cityState, latitude, longitude, dis);
 
             // Reset trip-related state variables after saving trip data
             setTripStarted(false);
@@ -232,10 +269,8 @@ export default function HomeScreen({navigation}) {
 
             console.log('Trip ended successfully');
 
-
-            //end Tracking 
+            // Stop location tracking
             stopLocationTracking();
-
         } catch (error) {
             console.error('Error ending trip:', error);
         }
@@ -318,8 +353,8 @@ export default function HomeScreen({navigation}) {
 
                             <SafeAreaView style={{flexDirection:'row',marginTop:15,}}>
                                 <Ionicons name="car-outline" size={30} color="#f2d15f" />
-                                <Text style={styles.infoText}>Distance:</Text>
-                                <Text style={styles.numText}>{dis}</Text>
+                                <Text style={styles.infoText}>Distance: {dis.toFixed(2)} miles</Text>
+                                
                             </SafeAreaView>
                         </SafeAreaView>
 
