@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import * as Notifications from 'expo-notifications';
+
 import axios from 'axios';
 //import Geolocation from 'react-native-geolocation-service';
 import {
@@ -80,7 +81,7 @@ export default function HomeScreen({navigation}) {
         }
         console.log('Received new locations', locations);
     });
-    const LOCATION_TASK_NAME = 'background-location-task';
+
     // Function to calculate distance between two coordinates using Haversine formula
     const calculateDistance = async (prevLocation, newLocation) => {
         try {
@@ -215,9 +216,22 @@ export default function HomeScreen({navigation}) {
             console.log('Start Location Latitude / Longitude:', latitude, longitude);
             setTripPlay(true);
             setTripStarted(true);
+            // Create a notification message with the trip start information
+            const notificationTitle = 'Trip Started';
+            const notificationBody = `Starting Address: ${address}\nTrip Date: ${currentDate}\nCurrent Trip Time: ${timer(time)}\nCurrent Distance Traveled: ${dis.toFixed(2)} miles`;
+
+            // Display the notification
+            Notifications.scheduleNotificationAsync({
+                content: {
+                    title: notificationTitle,
+                    body: notificationBody,
+                },
+                trigger: null, // Display immediately
+            });
         } catch (error) {
             console.error('Error starting trip:', error);
             // Handle error (e.g., show alert)
+
         }
     };
 
