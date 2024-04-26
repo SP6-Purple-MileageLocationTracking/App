@@ -80,7 +80,7 @@ export default function HomeScreen({navigation}) {
         }
         console.log('Received new locations', locations);
     });
-
+    const LOCATION_TASK_NAME = 'background-location-task';
     // Function to calculate distance between two coordinates using Haversine formula
     const calculateDistance = async (prevLocation, newLocation) => {
         try {
