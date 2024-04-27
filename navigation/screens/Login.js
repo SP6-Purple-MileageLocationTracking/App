@@ -1,19 +1,10 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react/react-in-jsx-scope */
-import { StatusBar } from 'expo-status-bar';
 import {
-    StyleSheet, Button, View, SafeAreaView,
-    Text, Alert, TextInput, TouchableOpacity, Modal
+    StyleSheet, View,
+    Text, TextInput, TouchableOpacity, Modal
 } from 'react-native';
 import React, { useState } from 'react';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-
-
-
-
-
 
 export default function Login({ navigation }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -38,13 +29,11 @@ export default function Login({ navigation }) {
         }
     };
     
-    
     const onPressCreateAccount = () => {
         console.log('CreateAccount Pressed')
         navigation.navigate("CreateAccount")
     };
 
-    
     return(
     <View style={styles.container}>
         <Text style={styles.title}>Log In</Text>
@@ -71,8 +60,6 @@ export default function Login({ navigation }) {
             <TouchableOpacity onPress={onPressCreateAccount}>
                 <Text style={styles.forgotAndSignUpText}>Create Account</Text>
             </TouchableOpacity>
-
-
         <Modal visible={isModalVisible} onRequestClose={() => setIsModalVisible(false)} animationType="slide" transparent={true}>
             <View style ={styles.bottomView}>
                 <Text style={styles.modalText}>Log In Failed</Text>
@@ -81,10 +68,7 @@ export default function Login({ navigation }) {
                 </TouchableOpacity>
             </View>
         </Modal>
-
-
   </View>
-
     );
 }
 
@@ -160,5 +144,4 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         alignSelf: 'center',
     },
-
   });

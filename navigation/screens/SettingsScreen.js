@@ -1,17 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react/react-in-jsx-scope */
-import { StatusBar } from 'expo-status-bar';
-
 import {
-    StyleSheet, Button, View, SafeAreaView,
-    Text, Alert, PermissionsAndroid, TouchableOpacity, TextInput
+    StyleSheet, View,
+    Text, Alert, TouchableOpacity, TextInput
 } from 'react-native';
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { getAuth, updatePassword, updateEmail, verifyBeforeUpdateEmail, reauthenticateWithCredential, EmailAuthProvider} from "firebase/auth";
-
-
+import { getAuth, updatePassword, verifyBeforeUpdateEmail, reauthenticateWithCredential, EmailAuthProvider} from "firebase/auth";
 
 export default function SettingsScreen({navigation}) {
     const [SettingsScreen, setSettingsScreen] = useState(true)

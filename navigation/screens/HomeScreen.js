@@ -1,23 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react/react-in-jsx-scope */
-import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import * as Notifications from 'expo-notifications';
-
 import axios from 'axios';
 //import Geolocation from 'react-native-geolocation-service';
 import {
-    StyleSheet, Button, View, SafeAreaView,
-    Text, Alert, TouchableOpacity, PermissionsAndroid 
+    StyleSheet, View, SafeAreaView,
+    Text, TouchableOpacity, PermissionsAndroid 
 } from 'react-native';
 import React, {useState, useRef, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { collection, addDoc, getDocs, query, where, serverTimestamp, setLogLevel } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import { userId } from '../../FirebaseConfig';
-import { hasServicesEnabledAsync } from 'expo-location';
-
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyDCPuhY1_x2p9wCwUBtoy4ZDhNmoPSlpNY';
 Location.setGoogleApiKey(GOOGLE_MAPS_API_KEY);
@@ -41,7 +35,6 @@ const getLocationFromCoords = async (latitude, longitude) => {
     }
 };
 
-
 export default function HomeScreen({navigation}) {
     const [errorMsg, setErrorMsg] = useState(null);
     const [tripStarted, setTripStarted] = useState(false)
@@ -55,7 +48,6 @@ export default function HomeScreen({navigation}) {
     const [dis, setDis] = useState(0)
     const [disableButton, setDisableButton] = useState(false)
 
-    //Don't Move
     const [location, setLocation] = useState(null);
     const [rawStartLocation, setRawStartLocation] = useState(null);
     const [rawEndLocation, setRawEndLocation] = useState(null);
@@ -103,7 +95,6 @@ export default function HomeScreen({navigation}) {
             return 0;
         }
     };
-
 
     const startLocationTracking = async () => {
         try {

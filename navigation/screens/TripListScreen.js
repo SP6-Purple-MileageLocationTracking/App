@@ -1,16 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react/react-in-jsx-scope */
-import { StatusBar } from 'expo-status-bar';
 import {
-    StyleSheet, Button, View, SafeAreaView,
-    Text, Alert, TextInput, ActivityIndicator, 
-    Image, TouchableOpacity
+    StyleSheet, View, SafeAreaView,
+    Text, TextInput, 
+    TouchableOpacity
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { FlatList, GestureHandlerRootView } from 'react-native';
+import { FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { Directions } from 'react-native-gesture-handler';
 import { CheckBox } from 'react-native-elements';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import { collection, getDocs, query, where, orderBy} from 'firebase/firestore'; 
@@ -57,123 +53,6 @@ export default function TripListScreen({navigation}) {
     const [selectionMode, setSelectionMode] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
 
-    //TEST TRIPS
-    /*
-    const trips = [
-        {
-            id: 1,
-            date: '3 / 6 / 24',
-            start: 'ATL',
-            end: 'TPA',
-            mileage: 24.4,
-            dist: 400,
-        },
-        {
-            id: 2,
-            date: '3 / 6 / 24',
-            start: 'ALB',
-            end: 'LAX',
-            mileage: 120,
-            dist: 2800,
-        },
-        {
-            id: 3,
-            date: '3 / 6 / 24',
-            start: 'MDW',
-            end: 'HOU',
-            mileage: 82.5,
-            dist: 1000,
-        },
-        {
-            id: 4,
-            date: '3 / 6 / 24',
-            start: 'MIA',
-            end: 'SEA',
-            mileage: 150.7,
-            dist: 3000,
-        },
-        {
-            id: 5,
-            date: '3 / 6 / 24',
-            start: 'Den',
-            end: 'PHX',
-            mileage: 60.2,
-            dist: 800,
-        },
-        {
-            id: 6,
-            date: '3 / 6 / 24',
-            start: 'BOS',
-            end: 'SFO',
-            mileage: 123.8,
-            dist: 2900,
-        },
-        {
-            id: 7,
-            date: '3 / 6 / 24',
-            start: 'DAL',
-            end: 'MCO',
-            mileage: 93.6,
-            dist: 1100,
-        },
-        {
-            id: 8,
-            date: '3 / 6 / 24',
-            start: 'DCA',
-            end: 'LAS',
-            mileage: 140.5,
-            dist: 2400,
-        },
-        {
-            id: 9,
-            date: '3 / 6 / 24',
-            start: 'PHL',
-            end: 'SAN',
-            mileage: 127.2,
-            dist: 2700,
-        },
-        {
-            id: 10,
-            date: '3 / 6 / 24',
-            start: 'HOU',
-            end: 'PWM',
-            mileage: 185.3,
-            dist: 3200,
-        },
-        {
-            id: 11,
-            date: '3 / 6 / 24',
-            start: 'SEA',
-            end: 'MIA',
-            mileage: 150.7,
-            dist: 3000,
-        },
-        {
-            id: 12,
-            date: '3 / 6 / 24',
-            start: 'LAX',
-            end: 'ALB',
-            mileage: 120,
-            dist: 2800,
-        },
-        {
-            id: 13,
-            date: '3 / 6 / 24',
-            start: 'SFO',
-            end: 'BOS',
-            mileage: 123.8,
-            dist: 2900,
-        },
-        {
-            id: 14,
-            date: '3 / 6 / 24',
-            start: 'MCO',
-            end: 'DAL',
-            mileage: 93.6,
-            dist: 1100,
-        },
-    ];
-    */
     const toggleSelection = (id) => {
         if (selectedItems.includes(id)) {
             setSelectedItems(selectedItems.filter(itemId => itemId !== id));
@@ -201,7 +80,6 @@ export default function TripListScreen({navigation}) {
         const month = splitDate[0];
         const day = splitDate[1];
         const year = splitDate[2].substring(2); 
-        
 
             return(
                 <View style={styles.tripContainer} key={item.id}>
@@ -244,10 +122,8 @@ export default function TripListScreen({navigation}) {
         setSelectionMode(selectMode => !selectMode);
     };
 
-   
     const generatePDF = async (selectedTrips) => {
         try {
-            
             const tableRows = selectedTrips.map(trip => `
                 <tr>
                     <td>${trip.date}</td>
@@ -296,11 +172,9 @@ export default function TripListScreen({navigation}) {
                 </html>
             `;
     
-            
             const pdf = await Print.printToFileAsync({ html: format });
             const pdfUri = pdf.uri;
     
-            
             const localUri = `${FileSystem.documentDirectory}trip_report.pdf`;
             await FileSystem.moveAsync({
                 from: pdfUri,
@@ -314,8 +188,8 @@ export default function TripListScreen({navigation}) {
         }
     };
     
-    
-
+    //This is the function that will create a pdf, make sure to use selectedTrips
+    //for pdf creation, it is a list of trips with all the info for each trip within it
     const onPressCreatePDF = async () => {
         console.log('pdf Pressed')
         setSelectionMode(selectMode => !selectMode);
@@ -329,20 +203,11 @@ export default function TripListScreen({navigation}) {
         } else {
             console.log('Failed to generate PDF');
         }
-
-    
         selectedTrips.forEach(selectedTrip => {
             console.log(selectedTrip);
         });
-
-
-
-        //This is the function that will create a pdf, make sure to use selectedTrips
-        //for pdf creation, it is a list of trips with all the info for each trip within it
     };
 
-
-    /*for the search bar -Alex*/
 const [searchQuery, setSearchQuery] = useState('');
 
 //handles changes in the query
@@ -355,8 +220,6 @@ const filteredTrips = trips.filter(trip =>
   trip.startLoc.toLowerCase().includes(searchQuery.toLowerCase()) ||
   trip.endLoc.toLowerCase().includes(searchQuery.toLowerCase())
 );
-
-
     return(
         <SafeAreaView style={styles.container}>
             
@@ -395,9 +258,7 @@ const filteredTrips = trips.filter(trip =>
                     renderItem={({ item }) => <OneTrip item={item} />}
                     keyExtractor={(item) => item.id.toString()}
                 />
-            </SafeAreaView>
-
-            
+            </SafeAreaView> 
             {selectionMode && (
                 <SafeAreaView style={styles.uploadOverlay}>
                     <Text style={styles.overlayText}>{selectedItems.length}</Text>
@@ -408,9 +269,6 @@ const filteredTrips = trips.filter(trip =>
                     </TouchableOpacity>
                 </SafeAreaView>
             )}
-            
-        
-            
         </SafeAreaView>
     );
 }
@@ -552,8 +410,5 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         marginVertical: 15,
     },
-
-
-
   });
   

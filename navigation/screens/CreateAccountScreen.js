@@ -1,21 +1,12 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react/react-in-jsx-scope */
-import { StatusBar } from 'expo-status-bar';
 import {
-    StyleSheet, Button, View, SafeAreaView,
-    Text, Alert, TextInput, TouchableOpacity, Modal
+    StyleSheet, View,
+    Text, TextInput, TouchableOpacity, Modal
 } from 'react-native';
 import React, { useState } from 'react';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
-import { collection, getDocs, addDoc } from 'firebase/firestore'; 
-import Ionicons from 'react-native-vector-icons/Ionicons'
-
-
-
-
+import { collection, addDoc } from 'firebase/firestore'; 
 
 export default function CreateAccount({ navigation }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -55,7 +46,6 @@ export default function CreateAccount({ navigation }) {
             console.error('Error creating user collection: ', error);
         }
     };
-    
     const onPressSignIn = () => {
         console.log('Already Has An Account Pressed')
         navigation.navigate("Login")
@@ -105,7 +95,6 @@ export default function CreateAccount({ navigation }) {
             </Modal>
 
         </View>
-
     );
 }
 
@@ -181,5 +170,4 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         alignSelf: 'center',
     },
-
 });
