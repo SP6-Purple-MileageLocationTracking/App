@@ -15,6 +15,9 @@ import { CheckBox } from 'react-native-elements';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import { collection, getDocs, query, where, orderBy} from 'firebase/firestore'; 
 import { userId } from '../../FirebaseConfig';
+import * as Print from 'expo-print';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 const API_ENDPOINT = `https://randomuser.me/api/?results=30`;
 
@@ -238,21 +241,101 @@ export default function TripListScreen({navigation}) {
 
     const onPressUpload = () => {
         console.log('upload Pressed')
-        //navigation.navigate("PDFGenerator")
         setSelectionMode(selectMode => !selectMode);
     };
 
-    const onPressCreatePDF = () => {
+   
+    const generatePDF = async (selectedTrips) => {
+        try {
+            
+            const tableRows = selectedTrips.map(trip => `
+                <tr>
+                    <td>${trip.date}</td>
+                    <td>${trip.startLoc}</td>
+                    <td>${trip.endLoc}</td>
+                    <td>${trip.time}</td>
+                    <td>${trip.distance}</td>
+                </tr>
+            `).join('');
+    
+            const format = `
+                <html>
+                    <head>
+                        <style>
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                            }
+                            th, td {
+                                border: 1px solid #000;
+                                padding: 8px;
+                                text-align: left;
+                            }
+                            th {
+                                background-color: #f2d15f;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h1 style="text-align: center;">Trip Report</h1>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Start Location</th>
+                                    <th>End Location</th>
+                                    <th>Time</th>
+                                    <th>Distance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    </body>
+                </html>
+            `;
+    
+            
+            const pdf = await Print.printToFileAsync({ html: format });
+            const pdfUri = pdf.uri;
+    
+            
+            const localUri = `${FileSystem.documentDirectory}trip_report.pdf`;
+            await FileSystem.moveAsync({
+                from: pdfUri,
+                to: localUri,
+            });
+    
+            return localUri;
+        } catch (error) {
+            console.error('Error with PDF:', error);
+            return null;
+        }
+    };
+    
+    
+
+    const onPressCreatePDF = async () => {
         console.log('pdf Pressed')
         setSelectionMode(selectMode => !selectMode);
         const selectedTrips = selectedItems.map(itemId => {
             return trips.find(item => item.id === itemId);
         });
 
+        const pdfUri = await generatePDF(selectedTrips);
+        if (pdfUri) {
+            await Sharing.shareAsync(pdfUri);
+        } else {
+            console.log('Failed to generate PDF');
+        }
+
     
         selectedTrips.forEach(selectedTrip => {
             console.log(selectedTrip);
         });
+
+
 
         //This is the function that will create a pdf, make sure to use selectedTrips
         //for pdf creation, it is a list of trips with all the info for each trip within it
@@ -393,7 +476,7 @@ const styles = StyleSheet.create({
     },
     listSection: {
         position: 'relative',
-        top: '30%',
+        top: '33%',
     },
     searchBox: {
         backgroundColor: '#211D26',
@@ -433,7 +516,6 @@ const styles = StyleSheet.create({
         borderColor:"#211D26",
         borderRadius: 20,
         top: '20%',
-        
     },
     checkBox: {
         padding: 0
