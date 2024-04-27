@@ -38,10 +38,6 @@ export default function Login({ navigation }) {
         }
     };
     
-    const onPressForgotPassword = () => {
-        console.log('ForgotPassword Pressed')
-        // Look Into Custom Dialogs with React Native, Alerts don't allow text input to be placed in them - Z
-    };
     
     const onPressCreateAccount = () => {
         console.log('CreateAccount Pressed')
@@ -71,9 +67,6 @@ export default function Login({ navigation }) {
             </View>
             <TouchableOpacity onPress={onPressLogin}>
                 <Text style={styles.loginText}>Login Now</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={onPressForgotPassword}>
-                <Text style={styles.forgotAndSignUpText}>Forgot Password?</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={onPressCreateAccount}>
                 <Text style={styles.forgotAndSignUpText}>Create Account</Text>
